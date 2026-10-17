@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* ClaimSat design tokens. Use these through Tailwind classes
+   (bg-brand, text-ink-muted, border-line, ...), not raw hex values. */
+@theme {
+  --color-surface: #ffffff;
+  --color-surface-muted: #f6f5f1;
+  --color-line: #e3e1da;
+  --color-ink: #1c1f1d;
+  --color-ink-muted: #5c625e;
+
+  --color-brand: #1f6f43;
+  --color-brand-strong: #17573a;
+  --color-brand-soft: #e6f2ea;
+
+  --color-warn: #b7791f;
+  --color-warn-soft: #fdf3e1;
+  --color-danger: #b42318;
+  --color-danger-soft: #fdecea;
+}
+
+/* Damage levels on the dashboard map. `static` keeps these variables in the CSS
+   even though no utility class uses them (the map reads them from JavaScript). */
+@theme static {
+  --color-level-none: #2e7d4f;
+  --color-level-low: #c9a227;
+  --color-level-moderate: #e07b24;
+  --color-level-severe: #b42318;
+  --color-level-unknown: #8a8f8c;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-kannada: var(--font-noto-kannada), var(--font-inter), sans-serif;
+}
+
+body {
+  background: var(--color-surface-muted);
+  color: var(--color-ink);
+}
+
+/* Printing the evidence report: A4, white page, keep colours of badges and images. */
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  body {
+    background: #ffffff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npx create-next-app@latest:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m venv:*)",
+      "Bash(python -m app.ee_analysis:*)",
+      "Bash(pytest:*)",
+      "Bash(uvicorn:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(gcloud config list:*)",
+      "Bash(gcloud services list:*)",
+      "Bash(gcloud run services list:*)",
+      "Bash(gcloud run services describe:*)"
+    ],
+    "ask": [
+      "Bash(gcloud run deploy:*)",
+      "Bash(gcloud services enable:*)",
+      "Bash(gcloud iam:*)",
+      "Bash(gcloud projects add-iam-policy-binding:*)",
+      "Bash(gcloud storage buckets create:*)",
+      "Bash(bq mk:*)",
+      "Bash(bq rm:*)"
+    ]
+  }
+}

@@ -1,0 +1,243 @@
+{
+  "_note": "Safety net for DEMO_MODE: served for the sample seed plots only when live satellite analysis fails and no precomputed result exists. Marked source=sample; the UI labels it as sample data. Values are illustrative, not measurements.",
+  "assessment_id": "asm_sampledemo1",
+  "source": "sample",
+  "created_at": "2026-10-17T10:30:00Z",
+  "plot": {
+    "plot_id": "plt_seed_1",
+    "farmer_id": "KA-DEMO-001",
+    "survey_number": "112/3",
+    "farmer_name": "Ramesh",
+    "village": "Athani taluk",
+    "crop": "sugarcane",
+    "area_ha": 1.02,
+    "area_pixels": 102,
+    "centroid": {
+      "lat": 16.73,
+      "lng": 75.06
+    },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            75.0595,
+            16.7295
+          ],
+          [
+            75.0605,
+            16.7295
+          ],
+          [
+            75.0605,
+            16.7305
+          ],
+          [
+            75.0595,
+            16.7305
+          ],
+          [
+            75.0595,
+            16.7295
+          ]
+        ]
+      ]
+    }
+  },
+  "event": {
+    "type": "flood",
+    "date": "2019-08-07",
+    "windows": {
+      "before": {
+        "start": "2019-07-08",
+        "end": "2019-08-06"
+      },
+      "after": {
+        "start": "2019-08-12",
+        "end": "2019-09-06"
+      },
+      "radar_pre": {
+        "start": "2019-07-08",
+        "end": "2019-08-06"
+      },
+      "radar_post": {
+        "start": "2019-08-07",
+        "end": "2019-08-17"
+      },
+      "series": {
+        "start": "2019-05-09",
+        "end": "2019-10-06"
+      },
+      "baseline_years": [
+        2016,
+        2017,
+        2018
+      ]
+    }
+  },
+  "metrics": {
+    "ndvi_before": 0.71,
+    "ndvi_after": 0.24,
+    "ndvi_baseline_after": 0.68,
+    "ndvi_loss": 0.65,
+    "flood_fraction": 0.83,
+    "rain_deficit": null,
+    "season_rain_mm": null,
+    "baseline_rain_mm": null,
+    "crop_fraction": 0.78,
+    "clear_obs_before": 3,
+    "clear_obs_after": 4,
+    "radar_obs_pre": 2,
+    "radar_obs_post": 1
+  },
+  "score": {
+    "damage_score": 74,
+    "damage_level": "severe"
+  },
+  "confidence": {
+    "level": "high",
+    "reasons": [
+      "3 or more cloud-free Sentinel-2 images before and after the event",
+      "Radar images available before and after the event",
+      "Plot is mostly cropland (78%)",
+      "Plot covers 102 satellite pixels"
+    ]
+  },
+  "images": {
+    "true_colour_before": "/mock/true_colour_before.svg",
+    "true_colour_after": "/mock/true_colour_after.svg",
+    "ndvi_after": "/mock/ndvi_after.svg",
+    "flood_mask": "/mock/flood_mask.svg"
+  },
+  "acquisitions": {
+    "s2_before": [
+      "2019-07-14",
+      "2019-07-24",
+      "2019-08-03"
+    ],
+    "s2_after": [
+      "2019-08-18",
+      "2019-08-23",
+      "2019-08-28",
+      "2019-09-02"
+    ],
+    "s1_pre": [
+      "2019-07-22",
+      "2019-08-03"
+    ],
+    "s1_post": [
+      "2019-08-09"
+    ]
+  },
+  "ndvi_series": {
+    "this_year": [
+      {
+        "day_offset": -84,
+        "date": "2019-05-15",
+        "ndvi": 0.52
+      },
+      {
+        "day_offset": -54,
+        "date": "2019-06-14",
+        "ndvi": 0.61
+      },
+      {
+        "day_offset": -24,
+        "date": "2019-07-14",
+        "ndvi": 0.7
+      },
+      {
+        "day_offset": -4,
+        "date": "2019-08-03",
+        "ndvi": 0.72
+      },
+      {
+        "day_offset": 11,
+        "date": "2019-08-18",
+        "ndvi": 0.21
+      },
+      {
+        "day_offset": 26,
+        "date": "2019-09-02",
+        "ndvi": 0.27
+      },
+      {
+        "day_offset": 56,
+        "date": "2019-10-02",
+        "ndvi": 0.38
+      }
+    ],
+    "baseline": [
+      {
+        "day_offset": -84,
+        "ndvi": 0.5
+      },
+      {
+        "day_offset": -54,
+        "ndvi": 0.58
+      },
+      {
+        "day_offset": -24,
+        "ndvi": 0.65
+      },
+      {
+        "day_offset": -4,
+        "ndvi": 0.68
+      },
+      {
+        "day_offset": 11,
+        "ndvi": 0.69
+      },
+      {
+        "day_offset": 26,
+        "ndvi": 0.68
+      },
+      {
+        "day_offset": 56,
+        "ndvi": 0.66
+      }
+    ]
+  },
+  "evidence_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "report": {
+    "generated_at": "2026-10-17T10:31:00Z",
+    "model": "sample (no live data)",
+    "summary_en": "Satellite images show severe damage to this sugarcane field after the flood on 7 August 2019. Radar images found that 83% of the field was under water, and crop health afterwards was 65% below what is normal for these weeks. The damage score is 74 out of 100, with high confidence. This report is supporting evidence for your insurance claim, not an official loss assessment.",
+    "summary_kn": "2019ರ ಆಗಸ್ಟ್ 7ರ ಪ್ರವಾಹದ ನಂತರ ಈ ಕಬ್ಬಿನ ಹೊಲಕ್ಕೆ ತೀವ್ರ ಹಾನಿಯಾಗಿರುವುದನ್ನು ಉಪಗ್ರಹ ಚಿತ್ರಗಳು ತೋರಿಸುತ್ತವೆ. ರಾಡಾರ್ ಚಿತ್ರಗಳ ಪ್ರಕಾರ ಹೊಲದ 83% ಭಾಗ ನೀರಿನಲ್ಲಿ ಮುಳುಗಿತ್ತು. ಪ್ರವಾಹದ ನಂತರ ಬೆಳೆಯ ಆರೋಗ್ಯ ಈ ವಾರಗಳಲ್ಲಿ ಸಾಮಾನ್ಯವಾಗಿ ಇರುವುದಕ್ಕಿಂತ 65% ಕಡಿಮೆಯಾಗಿದೆ. ಹಾನಿ ಅಂಕ 100ರಲ್ಲಿ 74, ವಿಶ್ವಾಸಾರ್ಹತೆ ಹೆಚ್ಚು. ಈ ವರದಿ ನಿಮ್ಮ ವಿಮೆ ಕ್ಲೇಮ್‌ಗೆ ಪೂರಕ ಸಾಕ್ಷ್ಯ ಮಾತ್ರ, ಅಧಿಕೃತ ನಷ್ಟ ಮೌಲ್ಯಮಾಪನವಲ್ಲ.",
+    "findings": [
+      {
+        "title_en": "Most of the field was flooded",
+        "title_kn": "ಹೊಲದ ಹೆಚ್ಚಿನ ಭಾಗ ಜಲಾವೃತವಾಗಿತ್ತು",
+        "detail_en": "Radar satellites, which see through clouds, show standing water on 83% of the field in the days after 7 August 2019.",
+        "detail_kn": "ಮೋಡಗಳ ಮೂಲಕವೂ ನೋಡಬಲ್ಲ ರಾಡಾರ್ ಉಪಗ್ರಹಗಳು, 2019ರ ಆಗಸ್ಟ್ 7ರ ನಂತರದ ದಿನಗಳಲ್ಲಿ ಹೊಲದ 83% ಭಾಗದಲ್ಲಿ ನೀರು ನಿಂತಿರುವುದನ್ನು ತೋರಿಸುತ್ತವೆ."
+      },
+      {
+        "title_en": "Crop health fell sharply",
+        "title_kn": "ಬೆಳೆಯ ಆರೋಗ್ಯ ತೀವ್ರವಾಗಿ ಕುಸಿದಿದೆ",
+        "detail_en": "After the flood, crop health measured from satellite images was 65% below the normal level for the same weeks in 2016–2018.",
+        "detail_kn": "ಪ್ರವಾಹದ ನಂತರ, ಉಪಗ್ರಹ ಚಿತ್ರಗಳಿಂದ ಅಳೆದ ಬೆಳೆಯ ಆರೋಗ್ಯ 2016–2018ರ ಇದೇ ವಾರಗಳ ಸಾಮಾನ್ಯ ಮಟ್ಟಕ್ಕಿಂತ 65% ಕಡಿಮೆ ಇತ್ತು."
+      },
+      {
+        "title_en": "The crop was healthy before the flood",
+        "title_kn": "ಪ್ರವಾಹಕ್ಕೂ ಮೊದಲು ಬೆಳೆ ಆರೋಗ್ಯವಾಗಿತ್ತು",
+        "detail_en": "In the month before the flood, crop health was at or above normal, so the drop matches the flood rather than a normal harvest.",
+        "detail_kn": "ಪ್ರವಾಹಕ್ಕೂ ಹಿಂದಿನ ತಿಂಗಳಲ್ಲಿ ಬೆಳೆಯ ಆರೋಗ್ಯ ಸಾಮಾನ್ಯ ಮಟ್ಟದಲ್ಲಿ ಅಥವಾ ಅದಕ್ಕಿಂತ ಹೆಚ್ಚಾಗಿತ್ತು. ಆದ್ದರಿಂದ ಈ ಕುಸಿತ ಸಾಮಾನ್ಯ ಕಟಾವಿನಿಂದಲ್ಲ, ಪ್ರವಾಹದಿಂದ ಆಗಿದೆ."
+      }
+    ],
+    "confidence_reasons_kn": [
+      "ಘಟನೆಯ ಮೊದಲು ಮತ್ತು ನಂತರ 3 ಅಥವಾ ಹೆಚ್ಚು ಮೋಡರಹಿತ Sentinel-2 ಚಿತ್ರಗಳು ಲಭ್ಯವಿವೆ",
+      "ಘಟನೆಯ ಮೊದಲು ಮತ್ತು ನಂತರ ರಾಡಾರ್ ಚಿತ್ರಗಳು ಲಭ್ಯವಿವೆ",
+      "ಜಮೀನಿನ ಹೆಚ್ಚಿನ ಭಾಗ ಕೃಷಿ ಭೂಮಿ (78%)",
+      "ಜಮೀನು 102 ಉಪಗ್ರಹ ಪಿಕ್ಸೆಲ್‌ಗಳನ್ನು ಒಳಗೊಂಡಿದೆ"
+    ],
+    "limitations_en": "Clouds can hide parts of the field in optical images; radar was used to measure the flood. Each satellite pixel is 10 metres wide, so the edges of the field are less precise. The crop type is as reported by the user and was not checked from space.",
+    "limitations_kn": "ಮೋಡಗಳು ಕೆಲವೊಮ್ಮೆ ಹೊಲದ ಭಾಗಗಳನ್ನು ಮರೆಮಾಡಬಹುದು; ಪ್ರವಾಹವನ್ನು ಅಳೆಯಲು ರಾಡಾರ್ ಬಳಸಲಾಗಿದೆ. ಪ್ರತಿ ಉಪಗ್ರಹ ಪಿಕ್ಸೆಲ್ 10 ಮೀಟರ್ ಅಗಲವಿರುವುದರಿಂದ ಹೊಲದ ಅಂಚುಗಳ ಅಳತೆ ಕಡಿಮೆ ನಿಖರವಾಗಿರುತ್ತದೆ. ಬೆಳೆಯ ಪ್ರಕಾರವನ್ನು ಬಳಕೆದಾರರು ತಿಳಿಸಿದಂತೆ ಬರೆಯಲಾಗಿದೆ; ಅದನ್ನು ಉಪಗ್ರಹದಿಂದ ಪರಿಶೀಲಿಸಿಲ್ಲ.",
+    "recommended_next_steps_en": "Report the crop loss to your insurance company, bank or agriculture office within 72 hours of the event, as PMFBY requires, or as soon as possible if that time has passed. Attach this report and ask for a field inspection.",
+    "recommended_next_steps_kn": "PMFBY ನಿಯಮದಂತೆ ಘಟನೆ ನಡೆದ 72 ಗಂಟೆಗಳೊಳಗೆ ನಿಮ್ಮ ವಿಮಾ ಕಂಪನಿ, ಬ್ಯಾಂಕ್ ಅಥವಾ ಕೃಷಿ ಕಚೇರಿಗೆ ಬೆಳೆ ನಷ್ಟವನ್ನು ತಿಳಿಸಿ. ಆ ಸಮಯ ಕಳೆದಿದ್ದರೆ ಸಾಧ್ಯವಾದಷ್ಟು ಬೇಗ ತಿಳಿಸಿ. ಈ ವರದಿಯನ್ನು ಲಗತ್ತಿಸಿ ಮತ್ತು ಹೊಲ ಪರಿಶೀಲನೆಗೆ ಮನವಿ ಮಾಡಿ.",
+    "number_check": {
+      "ok": true,
+      "unexpected_percentages": []
+    }
+  },
+  "photo_check": null
+}

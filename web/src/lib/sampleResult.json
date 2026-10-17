@@ -1,0 +1,249 @@
+{
+  "_note": "Contract for the assessment result returned by POST /api/assess and GET /api/assessments/{id}. All values here are illustrative placeholders, not real measurements. Keep this file in sync with the backend output. score.damage_level is one of none|low|moderate|severe|unknown (unknown = no usable data). Any metric can be null when the satellite data for it is missing; radar_obs_* are null for non-flood events, rain fields are null for non-drought events. plot.plot_id is a registered plot (farmers can't draw plots; officers register them).",
+  "assessment_id": "asm_sample_flood1",
+  "source": "sample",
+  "created_at": "2026-10-17T10:30:00Z",
+  "plot": {
+    "plot_id": "plt_seed_1",
+    "farmer_id": "KA-DEMO-001",
+    "survey_number": "112/3",
+    "farmer_name": "Ramesh",
+    "village": "Athani taluk",
+    "crop": "sugarcane",
+    "area_ha": 1.02,
+    "area_pixels": 102,
+    "centroid": {
+      "lat": 16.73,
+      "lng": 75.06
+    },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            75.0595,
+            16.7295
+          ],
+          [
+            75.0605,
+            16.7295
+          ],
+          [
+            75.0605,
+            16.7305
+          ],
+          [
+            75.0595,
+            16.7305
+          ],
+          [
+            75.0595,
+            16.7295
+          ]
+        ]
+      ]
+    }
+  },
+  "event": {
+    "type": "flood",
+    "date": "2019-08-07",
+    "windows": {
+      "before": {
+        "start": "2019-07-08",
+        "end": "2019-08-06"
+      },
+      "after": {
+        "start": "2019-08-12",
+        "end": "2019-09-06"
+      },
+      "radar_pre": {
+        "start": "2019-07-08",
+        "end": "2019-08-06"
+      },
+      "radar_post": {
+        "start": "2019-08-07",
+        "end": "2019-08-17"
+      },
+      "series": {
+        "start": "2019-05-09",
+        "end": "2019-10-06"
+      },
+      "baseline_years": [
+        2016,
+        2017,
+        2018
+      ]
+    }
+  },
+  "metrics": {
+    "ndvi_before": 0.71,
+    "ndvi_after": 0.24,
+    "ndvi_baseline_after": 0.68,
+    "ndvi_loss": 0.65,
+    "flood_fraction": 0.83,
+    "rain_deficit": null,
+    "season_rain_mm": null,
+    "baseline_rain_mm": null,
+    "crop_fraction": 0.78,
+    "clear_obs_before": 3,
+    "clear_obs_after": 4,
+    "radar_obs_pre": 2,
+    "radar_obs_post": 1
+  },
+  "score": {
+    "damage_score": 74,
+    "damage_level": "severe"
+  },
+  "confidence": {
+    "level": "high",
+    "reasons": [
+      "3 or more cloud-free Sentinel-2 images before and after the event",
+      "Radar images available before and after the event",
+      "Plot is mostly cropland (78%)",
+      "Plot covers 102 satellite pixels"
+    ]
+  },
+  "images": {
+    "true_colour_before": "/api/assets/asm_sample_flood1/true_colour_before.png",
+    "true_colour_after": "/api/assets/asm_sample_flood1/true_colour_after.png",
+    "ndvi_after": "/api/assets/asm_sample_flood1/ndvi_after.png",
+    "flood_mask": "/api/assets/asm_sample_flood1/flood_mask.png"
+  },
+  "acquisitions": {
+    "s2_before": [
+      "2019-07-14",
+      "2019-07-24",
+      "2019-08-03"
+    ],
+    "s2_after": [
+      "2019-08-18",
+      "2019-08-23",
+      "2019-08-28",
+      "2019-09-02"
+    ],
+    "s1_pre": [
+      "2019-07-22",
+      "2019-08-03"
+    ],
+    "s1_post": [
+      "2019-08-09"
+    ]
+  },
+  "ndvi_series": {
+    "this_year": [
+      {
+        "day_offset": -84,
+        "date": "2019-05-15",
+        "ndvi": 0.52
+      },
+      {
+        "day_offset": -54,
+        "date": "2019-06-14",
+        "ndvi": 0.61
+      },
+      {
+        "day_offset": -24,
+        "date": "2019-07-14",
+        "ndvi": 0.7
+      },
+      {
+        "day_offset": -4,
+        "date": "2019-08-03",
+        "ndvi": 0.72
+      },
+      {
+        "day_offset": 11,
+        "date": "2019-08-18",
+        "ndvi": 0.21
+      },
+      {
+        "day_offset": 26,
+        "date": "2019-09-02",
+        "ndvi": 0.27
+      },
+      {
+        "day_offset": 56,
+        "date": "2019-10-02",
+        "ndvi": 0.38
+      }
+    ],
+    "baseline": [
+      {
+        "day_offset": -84,
+        "ndvi": 0.5
+      },
+      {
+        "day_offset": -54,
+        "ndvi": 0.58
+      },
+      {
+        "day_offset": -24,
+        "ndvi": 0.65
+      },
+      {
+        "day_offset": -4,
+        "ndvi": 0.68
+      },
+      {
+        "day_offset": 11,
+        "ndvi": 0.69
+      },
+      {
+        "day_offset": 26,
+        "ndvi": 0.68
+      },
+      {
+        "day_offset": 56,
+        "ndvi": 0.66
+      }
+    ]
+  },
+  "evidence_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "report": null,
+  "_report_shape_when_generated": {
+    "generated_at": "2026-10-17T10:31:00Z",
+    "model": "gemini-flash",
+    "summary_en": "",
+    "summary_kn": "",
+    "findings": [
+      {
+        "title_en": "",
+        "title_kn": "",
+        "detail_en": "",
+        "detail_kn": ""
+      }
+    ],
+    "confidence_reasons_kn": [
+      ""
+    ],
+    "limitations_en": "",
+    "limitations_kn": "",
+    "recommended_next_steps_en": "",
+    "recommended_next_steps_kn": "",
+    "number_check": {
+      "ok": true,
+      "unexpected_percentages": []
+    }
+  },
+  "photo_check": null,
+  "_photo_check_shape_when_checked": {
+    "photo_id": "ph_0000000000",
+    "photo_url": "/api/photos/asm_sample_flood1/ph_0000000000.jpg",
+    "checked_at": "2026-10-17T10:40:00Z",
+    "model": "gemini-flash",
+    "gps": {
+      "lat": 16.73,
+      "lng": 75.06
+    },
+    "taken_at": "2019-08-10T09:30:00",
+    "distance_m": 0,
+    "inside_plot": true,
+    "days_from_event": 3,
+    "flags": [],
+    "flag_messages": [],
+    "what_photo_shows": "standing_water | flattened_or_damaged_crop | dried_crop | healthy_crop | bare_soil | not_a_field | unclear",
+    "consistent": true,
+    "observations_en": "",
+    "observations_kn": ""
+  }
+}
