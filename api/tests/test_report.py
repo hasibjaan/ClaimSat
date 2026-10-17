@@ -33,7 +33,10 @@ def report_text(percent="65%", flooded="83%"):
 
 def test_facts_contain_only_measured_percentages():
     facts = report.build_facts(SAMPLE)
-    assert facts["percentages"] == {"crop_health_lost": 65, "field_flooded": 83, "plot_is_cropland": 78}
+    assert facts["percentages"] == {"crop_health_lost": 65, "field_newly_under_water": 83, "field_under_water_now": 86}
+    assert facts["verification"]["status"] == "verified"
+    assert facts["case_severity"]["level"] == "severe"
+    assert facts["nearby_reports"]["nearby_farmers"] == 6
     assert facts["damage"] == {"score_out_of_100": 74, "level": "severe"}
     assert facts["confidence"]["level"] == "high"
 
@@ -104,5 +107,19 @@ def test_report_endpoint_errors(client, monkeypatch):
     monkeypatch.setattr(report, "_ask_gemini", boom)
     assessment_id = client.post("/api/assess", json=BODY).json()["assessment_id"]
     response = client.post(f"/api/report/{assessment_id}")
-    assert response.status_code == 502
-    assert "couldn't write the report" in response.json()["error"]
+    # Without Gemini the farmer still gets the template-written report.
+    assert response.status_code == 200
+    written = response.json()["report"]
+    assert written["model"] == "template"
+    assert "crop health fell by 63%" in written["summary_en"]
+    assert "ಬೆಳೆಯ ಆರೋಗ್ಯ 63% ಕುಸಿದಿದೆ" in written["summary_kn"]
+
+
+def test_template_report_passes_the_number_check():
+    from app import report_template
+
+    written = report_template.build(SAMPLE)
+    as_model = report.ReportText(**{k: v for k, v in written.items() if k in report.ReportText.model_fields})
+    assert report.unexpected_percentages(as_model, report.build_facts(SAMPLE)) == []
+    assert written["confidence_reasons_kn"][0] == "ಘಟನೆಗೆ 1 ವಾರ ಮೊದಲಿನ ಸ್ಪಷ್ಟ Sentinel-2 ಚಿತ್ರ: 2019-07-31"
+    assert "6 other farmers within 2 km" in written["summary_en"]

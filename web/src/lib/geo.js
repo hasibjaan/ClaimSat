@@ -4,7 +4,7 @@
 const EARTH_RADIUS_M = 6378137;
 export const MIN_AREA_HA = 0.05;
 export const MAX_AREA_HA = 20;
-export const MIN_DAYS_AGO = 7;
+export const MIN_DAYS_AGO = 1; // the latest image is used, so recent events are fine
 export const EARLIEST_EVENT = "2016-01-01";
 const INDIA_BBOX = [68.0, 6.0, 98.0, 37.5];
 
@@ -56,7 +56,7 @@ export function dateError(value, now = new Date()) {
   if (!value) return "Choose the date of the flood, drought or damage.";
   if (value < EARLIEST_EVENT) return "Satellite data for ClaimSat starts in 2016. Choose a later date.";
   if (value > latestEventDate(now)) {
-    return `The date must be at least ${MIN_DAYS_AGO} days ago, so satellite images are available.`;
+    return "The date must be before today.";
   }
   return null;
 }

@@ -1,7 +1,7 @@
 """Assess a whole village of plots in one Earth Engine pass and load them into BigQuery.
 
 Lays a grid of 1-hectare plots over the demo flood area (centred on the flood1
-demo plot), keeps the ones that are mostly cropland, measures every plot with a
+demo plot), keeps the ones that were green before the event, measures every plot with a
 single server-side reduceRegions call, scores them with app.scoring, and loads
 them into BigQuery with source = "batch". Earlier batch rows are replaced.
 
@@ -20,22 +20,12 @@ from datetime import date, datetime, timezone
 import ee
 
 from app import assessments, config, scoring, validation, warehouse
-from app.ee_analysis import (
-    _crop_fraction_image,
-    _ndvi_composite,
-    _s1,
-    _s2_masked,
-    _shift_window,
-    build_windows,
-    flood_mask,
-    init_ee,
-    load_demo_plot,
-)
+from app.ee_analysis import S2_BANDS, _s2_masked, build_windows, init_ee, load_demo_plot, ndvi, water
 from scripts.find_demo_plots import _square
 
 GRID_HALF_KM = 1.6   # the village area is about 3.2 km x 3.2 km
 GRID_STEP_M = 150    # plot centres every 150 m (plots are 100 m wide, so they don't touch)
-MIN_CROPLAND = 0.6
+MIN_CROP_NDVI = 0.3  # a cell counts as cropland if it was green 1 week before
 VILLAGE_NAME = "Demo village, Krishna floodplain"
 
 
@@ -51,72 +41,56 @@ def grid_plots(center_lng, center_lat):
     ]
 
 
-def clear_count(collection):
-    """Per-pixel number of cloud-free observations (its plot mean ~ clear images)."""
-    return (
-        collection.map(lambda img: img.select(config.CS_BAND).mask().rename("n"))
-        .merge(ee.ImageCollection([ee.Image.constant(0).rename("n")]))
-        .sum()
-    )
-
-
 def measure(plots, event_type, event_date):
-    """One reduceRegions pass: every metric for every plot."""
-    event = date.fromisoformat(event_date)
-    windows = build_windows(event_type, event)
-    region = ee.Geometry.MultiPolygon([p["coordinates"] for p in plots]).bounds()
+    """One reduceRegions pass over Sentinel-2 composites: the week before vs after.
 
-    before = _s2_masked(region, windows["before"])
-    after = _s2_masked(region, windows["after"])
-    baseline = ee.ImageCollection(
-        [_ndvi_composite(_s2_masked(region, _shift_window(windows["after"], -k))) for k in range(1, config.BASELINE_YEARS + 1)]
-    ).mean()
-    pre = _s1(region, windows["radar_pre"])
-    post = _s1(region, windows["radar_post"])
+    A village survey uses cloud-free composites of each window rather than one
+    image per plot, so every plot gets values in a single pass.
+    """
+    windows = build_windows(date.fromisoformat(event_date))
+    region = ee.Geometry.MultiPolygon([p["coordinates"] for p in plots]).bounds()
+    before = _s2_masked(region, windows["before"]).select(S2_BANDS + [config.CS_BAND]).median()
+    now = _s2_masked(region, windows["now"]).select(S2_BANDS + [config.CS_BAND]).median()
 
     stack = ee.Image.cat(
         [
-            _ndvi_composite(before).rename("ndvi_before"),
-            _ndvi_composite(after).rename("ndvi_after"),
-            baseline.rename("ndvi_baseline_after"),
-            flood_mask(pre, post).rename("flood_fraction"),
-            _crop_fraction_image(region, event).rename("crop_fraction"),
-            clear_count(before).rename("clear_obs_before"),
-            clear_count(after).rename("clear_obs_after"),
+            ndvi(before).rename("ndvi_before"),
+            ndvi(now).rename("ndvi_now"),
+            water(before).rename("water_before"),
+            water(now).rename("water_now"),
+            water(now).And(water(before).Not()).rename("flood_fraction"),
+            before.select(config.CS_BAND).mask().rename("before_clear"),
+            now.select(config.CS_BAND).mask().rename("now_clear"),
         ]
     )
     features = ee.FeatureCollection([ee.Feature(ee.Geometry(p), {"i": i}) for i, p in enumerate(plots)])
-    measured = stack.reduceRegions(features, ee.Reducer.mean(), config.SCALE_M)
-    radar_counts = {"pre": pre.size(), "post": post.size()}
-    return measured.getInfo()["features"], ee.Dictionary(radar_counts).getInfo(), windows
+    return stack.reduceRegions(features, ee.Reducer.mean(), config.SCALE_M).getInfo()["features"], windows
 
 
-def build_results(plots, measured, radar, event_type, event_date, windows, max_plots):
+def build_results(plots, measured, event_type, event_date, windows, max_plots):
     created_at = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     results = []
     for feature in measured:
         props = feature["properties"]
-        if (props.get("crop_fraction") or 0) < MIN_CROPLAND:
+        if (props.get("ndvi_before") or 0) < MIN_CROP_NDVI:
             continue
         geometry = plots[props["i"]]
         r = lambda k, d=3: None if props.get(k) is None else round(props[k], d)  # noqa: E731
         metrics = {
             "ndvi_before": r("ndvi_before"),
-            "ndvi_after": r("ndvi_after"),
-            "ndvi_baseline_after": r("ndvi_baseline_after"),
+            "ndvi_now": r("ndvi_now"),
             "ndvi_loss": None,
+            "water_before": r("water_before"),
+            "water_now": r("water_now"),
             "flood_fraction": r("flood_fraction"),
-            "rain_deficit": None,
-            "season_rain_mm": None,
-            "baseline_rain_mm": None,
-            "crop_fraction": r("crop_fraction"),
-            # Approximate: mean per-pixel count of clear images over the plot.
-            "clear_obs_before": round(props.get("clear_obs_before") or 0),
-            "clear_obs_after": round(props.get("clear_obs_after") or 0),
-            "radar_obs_pre": radar["pre"],
-            "radar_obs_post": radar["post"],
+            # Composites: the dates are the window ends, not single images.
+            "before_image_date": windows["before"]["end"],
+            "now_image_date": windows["now"]["end"],
+            "before_clear": r("before_clear", 2),
+            "now_clear": r("now_clear", 2),
+            "days_between": (date.fromisoformat(windows["now"]["end"]) - date.fromisoformat(windows["before"]["end"])).days,
         }
-        loss = scoring.ndvi_loss(metrics["ndvi_after"], metrics["ndvi_baseline_after"])
+        loss = scoring.ndvi_loss(metrics["ndvi_now"], metrics["ndvi_before"])
         metrics["ndvi_loss"] = None if loss is None else round(loss, 3)
         area_ha = round(validation.ring_area_m2(geometry["coordinates"][0]) / 10_000, 2)
         scored = scoring.score_assessment(event_type, metrics, area_pixels=100)
@@ -135,7 +109,7 @@ def build_results(plots, measured, radar, event_type, event_date, windows, max_p
             "event": {"type": event_type, "date": event_date, "windows": windows},
             "metrics": metrics,
             **scored,
-            "acquisitions": {},
+            "acquisitions": {"before": windows["before"], "now": windows["now"], "satellite": "Sentinel-2"},
         }
         result["evidence_hash"] = assessments.evidence_hash(result)
         results.append(result)
@@ -160,8 +134,8 @@ def main():
     plots = grid_plots(*center)
     print(f"Measuring {len(plots)} grid cells around {center} for the {demo['event_date']} {demo['event_type']}…")
 
-    measured, radar, windows = measure(plots, demo["event_type"], demo["event_date"])
-    results = build_results(plots, measured, radar, demo["event_type"], demo["event_date"], windows, args.max_plots)
+    measured, windows = measure(plots, demo["event_type"], demo["event_date"])
+    results = build_results(plots, measured, demo["event_type"], demo["event_date"], windows, args.max_plots)
     levels = {}
     for res in results:
         levels[res["score"]["damage_level"]] = levels.get(res["score"]["damage_level"], 0) + 1
@@ -183,7 +157,6 @@ def main():
             "confidence": res["confidence"]["level"],
             "ndvi_loss": res["metrics"]["ndvi_loss"],
             "flood_fraction": res["metrics"]["flood_fraction"],
-            "rain_deficit": None,
             "source": "batch",
             "assessed_at": res["created_at"],
             "geometry": res["plot"]["geometry"],

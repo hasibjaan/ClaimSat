@@ -38,16 +38,17 @@ export default function NdviChart({ series, labels = DEFAULT_LABELS }) {
             pointRadius: 3,
             tension: 0.25,
           },
-          {
+          // Normal-years line, only when the result has one.
+          ...((series?.baseline ?? []).length ? [{
             label: labels.normal,
-            data: (series?.baseline ?? []).map((p) => ({ x: p.day_offset, y: p.ndvi })),
+            data: series.baseline.map((p) => ({ x: p.day_offset, y: p.ndvi })),
             borderColor: muted,
             backgroundColor: muted,
             borderDash: [6, 4],
             borderWidth: 2,
             pointRadius: 0,
             tension: 0.25,
-          },
+          }] : []),
           {
             label: "Event",
             data: [

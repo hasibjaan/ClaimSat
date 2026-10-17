@@ -14,7 +14,7 @@ MIN_AREA_HA = 0.05
 MAX_AREA_HA = 20
 INDIA_BBOX = (68.0, 6.0, 98.0, 37.5)  # min lng, min lat, max lng, max lat
 EARLIEST_EVENT = date(2016, 1, 1)
-MIN_DAYS_AGO = 7
+MIN_DAYS_AGO = 1   # the comparison uses the latest image, so recent events are fine
 MAX_TEXT = 80
 MAX_VERTICES = 200
 
@@ -121,7 +121,7 @@ def validate_event(event_type, event_date, season_window=None, today=None):
         raise ValidationError("Satellite data for ClaimSat starts in 2016. Choose a later date.")
     if event > latest:
         raise ValidationError(
-            f"The event date must be at least {MIN_DAYS_AGO} days ago, so satellite images are available."
+            "The event date must be before today."
         )
 
     season = None

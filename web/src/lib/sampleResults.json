@@ -1,0 +1,821 @@
+{
+  "_note": "Sample results for the demo plots, built by scripts/build_samples.py with the real scoring code. Illustrative numbers, not measurements.",
+  "plots": [
+    {
+      "plot_id": "plt_seed_1",
+      "farmer_id": "KA-DEMO-001",
+      "farmer_name": "Ramesh",
+      "village": "Athani taluk",
+      "survey_number": "112/3",
+      "crop": "sugarcane",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              75.0579,
+              16.7318
+            ],
+            [
+              75.0589,
+              16.7318
+            ],
+            [
+              75.0589,
+              16.7328
+            ],
+            [
+              75.0579,
+              16.7328
+            ],
+            [
+              75.0579,
+              16.7318
+            ]
+          ]
+        ]
+      },
+      "default_event": {
+        "event_type": "flood",
+        "event_date": "2019-08-07"
+      },
+      "area_ha": 1.19,
+      "source": "seed"
+    },
+    {
+      "plot_id": "plt_seed_2",
+      "farmer_id": "KA-DEMO-001",
+      "farmer_name": "Ramesh",
+      "village": "Athani taluk",
+      "survey_number": "118/1",
+      "crop": "sugarcane",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              75.07725,
+              16.7574
+            ],
+            [
+              75.07835,
+              16.7574
+            ],
+            [
+              75.07835,
+              16.7584
+            ],
+            [
+              75.07725,
+              16.7584
+            ],
+            [
+              75.07725,
+              16.7574
+            ]
+          ]
+        ]
+      },
+      "default_event": {
+        "event_type": "flood",
+        "event_date": "2019-08-07"
+      },
+      "area_ha": 1.31,
+      "source": "seed"
+    },
+    {
+      "plot_id": "plt_seed_3",
+      "farmer_id": "KA-DEMO-001",
+      "farmer_name": "Ramesh",
+      "village": "Athani taluk",
+      "survey_number": "124/2",
+      "crop": "maize",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              75.08255,
+              16.7119
+            ],
+            [
+              75.08365,
+              16.7119
+            ],
+            [
+              75.08365,
+              16.7129
+            ],
+            [
+              75.08255,
+              16.7129
+            ],
+            [
+              75.08255,
+              16.7119
+            ]
+          ]
+        ]
+      },
+      "default_event": {
+        "event_type": "flood",
+        "event_date": "2019-03-12"
+      },
+      "area_ha": 1.31,
+      "source": "seed"
+    }
+  ],
+  "results": {
+    "plt_seed_1": {
+      "assessment_id": "asm_sampleplot1",
+      "source": "sample",
+      "created_at": "2026-10-17T13:54:03Z",
+      "plot": {
+        "plot_id": "plt_seed_1",
+        "farmer_id": "KA-DEMO-001",
+        "survey_number": "112/3",
+        "farmer_name": "Ramesh",
+        "village": "Athani taluk",
+        "crop": "sugarcane",
+        "area_ha": 1.19,
+        "area_pixels": 119,
+        "centroid": {
+          "lat": 16.7323,
+          "lng": 75.0584
+        },
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                75.0579,
+                16.7318
+              ],
+              [
+                75.0589,
+                16.7318
+              ],
+              [
+                75.0589,
+                16.7328
+              ],
+              [
+                75.0579,
+                16.7328
+              ],
+              [
+                75.0579,
+                16.7318
+              ]
+            ]
+          ]
+        }
+      },
+      "event": {
+        "type": "flood",
+        "date": "2019-08-07",
+        "windows": {
+          "before": {
+            "start": "2019-07-26",
+            "end": "2019-08-04"
+          },
+          "before_target": "2019-07-31",
+          "now": {
+            "start": "2019-08-07",
+            "end": "2019-08-21"
+          },
+          "series": {
+            "start": "2019-07-08",
+            "end": "2019-08-21"
+          }
+        }
+      },
+      "metrics": {
+        "ndvi_before": 0.72,
+        "ndvi_now": 0.25,
+        "ndvi_loss": 0.653,
+        "water_before": 0.02,
+        "water_now": 0.86,
+        "flood_fraction": 0.83,
+        "before_image_date": "2019-07-31",
+        "now_image_date": "2019-08-15",
+        "before_clear": 0.94,
+        "now_clear": 0.88,
+        "days_between": 15
+      },
+      "score": {
+        "damage_score": 74,
+        "damage_level": "severe"
+      },
+      "confidence": {
+        "level": "high",
+        "reasons": [
+          "Clear Sentinel-2 image 1 week before: 2019-07-31",
+          "Clear Sentinel-2 image now: 2019-08-15",
+          "Plot covers 119 satellite pixels (10 m each)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "satellite": {
+          "passed": true,
+          "reason": "The satellite images show severe damage on this plot."
+        },
+        "weather": {
+          "verdict": "supported",
+          "rule_verdict": "supported",
+          "rule_reason": "Heavy rain: 286.4 mm across the region in the week before (normal 74.8 mm).",
+          "explanation_en": "The region had 286.4 mm of rain in the week before the flood, far above the normal 74.8 mm, with up to 71.3 mm in a single day. Weather like this can cause the flooding reported.",
+          "explanation_kn": "ಪ್ರವಾಹಕ್ಕೂ ಹಿಂದಿನ ವಾರ ಈ ಪ್ರದೇಶದಲ್ಲಿ 286.4 ಮಿ.ಮೀ ಮಳೆಯಾಗಿದೆ, ಇದು ಸಾಮಾನ್ಯ 74.8 ಮಿ.ಮೀಗಿಂತ ತುಂಬಾ ಹೆಚ್ಚು. ಒಂದೇ ದಿನದಲ್ಲಿ 71.3 ಮಿ.ಮೀ ವರೆಗೆ ಮಳೆಯಾಗಿದ್ದು, ಇಂತಹ ಪ್ರವಾಹಕ್ಕೆ ಕಾರಣವಾಗಬಹುದು.",
+          "model": "sample",
+          "facts": {
+            "rain_event_local_mm": 142.6,
+            "max_daily_rain_local_mm": 71.3,
+            "rain_week_region_mm": 286.4,
+            "normal_week_region_mm": 74.8,
+            "rain_month_local_mm": 512.0,
+            "normal_month_local_mm": 268.5,
+            "max_temp_c": 29.4,
+            "days_with_data": 10,
+            "region_km": 50,
+            "windows": {
+              "event_local": {
+                "start": "2019-08-04",
+                "end": "2019-08-08"
+              },
+              "week_region": {
+                "start": "2019-07-31",
+                "end": "2019-08-07"
+              },
+              "month_local": {
+                "start": "2019-07-08",
+                "end": "2019-08-07"
+              }
+            },
+            "source": "ERA5-Land daily weather (ECMWF / Copernicus)"
+          }
+        }
+      },
+      "area": {
+        "radius_km": 2,
+        "window_days": 7,
+        "nearby_reports": 6,
+        "nearby_farmers": 6,
+        "nearby_avg_damage": 67,
+        "level": "widespread"
+      },
+      "severity": {
+        "score": 82,
+        "level": "severe",
+        "reasons": [
+          "Plot damage score 74/100",
+          "6 other farmers within 2 km reported the same event"
+        ]
+      },
+      "images": {
+        "true_colour_before": "/mock/true_colour_before.svg",
+        "true_colour_now": "/mock/true_colour_after.svg",
+        "ndvi_now": "/mock/ndvi_after.svg",
+        "flood_mask": "/mock/flood_mask.svg"
+      },
+      "acquisitions": {
+        "before": "2019-07-31",
+        "now": "2019-08-15",
+        "satellite": "Sentinel-2"
+      },
+      "ndvi_series": {
+        "this_year": [
+          {
+            "day_offset": -27,
+            "date": "2019-07-11",
+            "ndvi": 0.63
+          },
+          {
+            "day_offset": -17,
+            "date": "2019-07-21",
+            "ndvi": 0.69
+          },
+          {
+            "day_offset": -7,
+            "date": "2019-07-31",
+            "ndvi": 0.72
+          },
+          {
+            "day_offset": 3,
+            "date": "2019-08-10",
+            "ndvi": 0.31
+          },
+          {
+            "day_offset": 8,
+            "date": "2019-08-15",
+            "ndvi": 0.25
+          },
+          {
+            "day_offset": 13,
+            "date": "2019-08-20",
+            "ndvi": 0.27
+          }
+        ],
+        "baseline": []
+      },
+      "report": {
+        "generated_at": "2026-10-17T13:54:03Z",
+        "model": "sample (template)",
+        "summary_en": "Flood reported on 2019-08-07. Sentinel-2 satellite images of this field from 2019-07-31 and 2019-08-15 show severe damage (damage score 74/100): crop health fell by 65% and 83% of the field became newly covered by water. 6 other farmers within 2 km reported the same event. Both checks support the claim: the satellite images show damage, and the weather record shows conditions that can cause it. Case severity: severe. This report is supporting evidence for your insurance claim, not an official loss assessment.",
+        "summary_kn": "2019-08-07 ರಂದು ಪ್ರವಾಹ ವರದಿಯಾಗಿದೆ. ಈ ಹೊಲದ 2019-07-31 ಮತ್ತು 2019-08-15 ರ Sentinel-2 ಉಪಗ್ರಹ ಚಿತ್ರಗಳ ಪ್ರಕಾರ ಹಾನಿಯ ಮಟ್ಟ: ತೀವ್ರ ಹಾನಿ (ಹಾನಿ ಅಂಕ 74/100). ಬೆಳೆಯ ಆರೋಗ್ಯ 65% ಕುಸಿದಿದೆ; ಹೊಲದ 83% ಭಾಗ ಹೊಸದಾಗಿ ನೀರಿನಲ್ಲಿ ಮುಳುಗಿದೆ. 2 ಕಿ.ಮೀ ಒಳಗಿನ ಇನ್ನೂ 6 ರೈತರು ಇದೇ ಘಟನೆಯನ್ನು ವರದಿ ಮಾಡಿದ್ದಾರೆ. ಎರಡೂ ಪರಿಶೀಲನೆಗಳು ಕ್ಲೇಮ್ ಅನ್ನು ಬೆಂಬಲಿಸುತ್ತವೆ: ಉಪಗ್ರಹ ಚಿತ್ರಗಳು ಹಾನಿಯನ್ನು ತೋರಿಸುತ್ತವೆ ಮತ್ತು ಹವಾಮಾನ ದಾಖಲೆಗಳು ಅದಕ್ಕೆ ಕಾರಣವಾಗಬಹುದಾದ ಪರಿಸ್ಥಿತಿಯನ್ನು ತೋರಿಸುತ್ತವೆ. ಪ್ರಕರಣದ ತೀವ್ರತೆ: ತೀವ್ರ. ಈ ವರದಿ ನಿಮ್ಮ ವಿಮೆ ಕ್ಲೇಮ್‌ಗೆ ಪೂರಕ ಸಾಕ್ಷ್ಯ ಮಾತ್ರ, ಅಧಿಕೃತ ನಷ್ಟ ಮೌಲ್ಯಮಾಪನವಲ್ಲ.",
+        "findings": [
+          {
+            "title_en": "What the satellite images show",
+            "title_kn": "ಉಪಗ್ರಹ ಚಿತ್ರಗಳು ತೋರಿಸುವುದು",
+            "detail_en": "Between 2019-07-31 and 2019-08-15, crop health fell by 65% and 83% of the field became newly covered by water.",
+            "detail_kn": "2019-07-31 ಮತ್ತು 2019-08-15 ರ ನಡುವೆ ಬೆಳೆಯ ಆರೋಗ್ಯ 65% ಕುಸಿದಿದೆ; ಹೊಲದ 83% ಭಾಗ ಹೊಸದಾಗಿ ನೀರಿನಲ್ಲಿ ಮುಳುಗಿದೆ."
+          },
+          {
+            "title_en": "What the weather record shows",
+            "title_kn": "ಹವಾಮಾನ ದಾಖಲೆ ತೋರಿಸುವುದು",
+            "detail_en": "The region had 286.4 mm of rain in the week before the flood, far above the normal 74.8 mm, with up to 71.3 mm in a single day. Weather like this can cause the flooding reported.",
+            "detail_kn": "ಪ್ರವಾಹಕ್ಕೂ ಹಿಂದಿನ ವಾರ ಈ ಪ್ರದೇಶದಲ್ಲಿ 286.4 ಮಿ.ಮೀ ಮಳೆಯಾಗಿದೆ, ಇದು ಸಾಮಾನ್ಯ 74.8 ಮಿ.ಮೀಗಿಂತ ತುಂಬಾ ಹೆಚ್ಚು. ಒಂದೇ ದಿನದಲ್ಲಿ 71.3 ಮಿ.ಮೀ ವರೆಗೆ ಮಳೆಯಾಗಿದ್ದು, ಇಂತಹ ಪ್ರವಾಹಕ್ಕೆ ಕಾರಣವಾಗಬಹುದು."
+          },
+          {
+            "title_en": "Reports from nearby farmers",
+            "title_kn": "ಹತ್ತಿರದ ರೈತರ ವರದಿಗಳು",
+            "detail_en": "6 other farmers within 2 km reported the same event.",
+            "detail_kn": "2 ಕಿ.ಮೀ ಒಳಗಿನ ಇನ್ನೂ 6 ರೈತರು ಇದೇ ಘಟನೆಯನ್ನು ವರದಿ ಮಾಡಿದ್ದಾರೆ."
+          }
+        ],
+        "confidence_reasons_kn": [
+          "ಘಟನೆಗೆ 1 ವಾರ ಮೊದಲಿನ ಸ್ಪಷ್ಟ Sentinel-2 ಚಿತ್ರ: 2019-07-31",
+          "ಇತ್ತೀಚಿನ ಸ್ಪಷ್ಟ Sentinel-2 ಚಿತ್ರ: 2019-08-15",
+          "ಜಮೀನು 119 ಉಪಗ್ರಹ ಪಿಕ್ಸೆಲ್‌ಗಳನ್ನು ಒಳಗೊಂಡಿದೆ (ಪ್ರತಿಯೊಂದು 10 ಮೀ)"
+        ],
+        "limitations_en": "Only two images are compared, so slow changes such as drought show less. Clouds can hide parts of a field. Each satellite pixel is 10 metres wide, so field edges are less precise. The crop type is as reported and was not checked from space.",
+        "limitations_kn": "ಕೇವಲ ಎರಡು ಚಿತ್ರಗಳನ್ನು ಹೋಲಿಸಲಾಗುತ್ತದೆ, ಆದ್ದರಿಂದ ಬರದಂತಹ ನಿಧಾನ ಬದಲಾವಣೆಗಳು ಕಡಿಮೆ ಕಾಣುತ್ತವೆ. ಮೋಡಗಳು ಹೊಲದ ಭಾಗಗಳನ್ನು ಮರೆಮಾಡಬಹುದು. ಪ್ರತಿ ಉಪಗ್ರಹ ಪಿಕ್ಸೆಲ್ 10 ಮೀಟರ್ ಅಗಲವಿರುವುದರಿಂದ ಹೊಲದ ಅಂಚುಗಳ ಅಳತೆ ಕಡಿಮೆ ನಿಖರವಾಗಿರುತ್ತದೆ. ಬೆಳೆಯ ಪ್ರಕಾರವನ್ನು ತಿಳಿಸಿದಂತೆ ಬರೆಯಲಾಗಿದೆ; ಅದನ್ನು ಉಪಗ್ರಹದಿಂದ ಪರಿಶೀಲಿಸಿಲ್ಲ.",
+        "recommended_next_steps_en": "Report the crop loss to your insurance company, bank or agriculture office within 72 hours of the event, as PMFBY requires, or as soon as possible if that time has passed. Attach this report and ask for a field inspection.",
+        "recommended_next_steps_kn": "PMFBY ನಿಯಮದಂತೆ ಘಟನೆ ನಡೆದ 72 ಗಂಟೆಗಳೊಳಗೆ ನಿಮ್ಮ ವಿಮಾ ಕಂಪನಿ, ಬ್ಯಾಂಕ್ ಅಥವಾ ಕೃಷಿ ಕಚೇರಿಗೆ ಬೆಳೆ ನಷ್ಟವನ್ನು ತಿಳಿಸಿ. ಆ ಸಮಯ ಕಳೆದಿದ್ದರೆ ಸಾಧ್ಯವಾದಷ್ಟು ಬೇಗ ತಿಳಿಸಿ. ಈ ವರದಿಯನ್ನು ಲಗತ್ತಿಸಿ ಮತ್ತು ಹೊಲ ಪರಿಶೀಲನೆಗೆ ಮನವಿ ಮಾಡಿ.",
+        "number_check": {
+          "ok": true,
+          "unexpected_percentages": []
+        }
+      },
+      "photo_check": null,
+      "evidence_hash": "sha256:95723448cb7025390a7869e27b9cd8a6cc890ebaeb5ac9d5c057f22af5c208f6"
+    },
+    "plt_seed_2": {
+      "assessment_id": "asm_sampleplot2",
+      "source": "sample",
+      "created_at": "2026-10-17T13:54:03Z",
+      "plot": {
+        "plot_id": "plt_seed_2",
+        "farmer_id": "KA-DEMO-001",
+        "survey_number": "118/1",
+        "farmer_name": "Ramesh",
+        "village": "Athani taluk",
+        "crop": "sugarcane",
+        "area_ha": 1.31,
+        "area_pixels": 131,
+        "centroid": {
+          "lat": 16.7579,
+          "lng": 75.0778
+        },
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                75.07725,
+                16.7574
+              ],
+              [
+                75.07835,
+                16.7574
+              ],
+              [
+                75.07835,
+                16.7584
+              ],
+              [
+                75.07725,
+                16.7584
+              ],
+              [
+                75.07725,
+                16.7574
+              ]
+            ]
+          ]
+        }
+      },
+      "event": {
+        "type": "flood",
+        "date": "2019-08-07",
+        "windows": {
+          "before": {
+            "start": "2019-07-26",
+            "end": "2019-08-04"
+          },
+          "before_target": "2019-07-31",
+          "now": {
+            "start": "2019-08-07",
+            "end": "2019-08-21"
+          },
+          "series": {
+            "start": "2019-07-08",
+            "end": "2019-08-21"
+          }
+        }
+      },
+      "metrics": {
+        "ndvi_before": 0.7,
+        "ndvi_now": 0.12,
+        "ndvi_loss": 0.829,
+        "water_before": 0.01,
+        "water_now": 0.91,
+        "flood_fraction": 0.9,
+        "before_image_date": "2019-07-31",
+        "now_image_date": "2019-08-15",
+        "before_clear": 0.92,
+        "now_clear": 0.86,
+        "days_between": 15
+      },
+      "score": {
+        "damage_score": 86,
+        "damage_level": "severe"
+      },
+      "confidence": {
+        "level": "high",
+        "reasons": [
+          "Clear Sentinel-2 image 1 week before: 2019-07-31",
+          "Clear Sentinel-2 image now: 2019-08-15",
+          "Plot covers 131 satellite pixels (10 m each)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "satellite": {
+          "passed": true,
+          "reason": "The satellite images show severe damage on this plot."
+        },
+        "weather": {
+          "verdict": "supported",
+          "rule_verdict": "supported",
+          "rule_reason": "Heavy rain: 286.4 mm across the region in the week before (normal 74.8 mm).",
+          "explanation_en": "The region had 286.4 mm of rain in the week before the flood, far above the normal 74.8 mm, with up to 71.3 mm in a single day. Weather like this can cause the flooding reported.",
+          "explanation_kn": "ಪ್ರವಾಹಕ್ಕೂ ಹಿಂದಿನ ವಾರ ಈ ಪ್ರದೇಶದಲ್ಲಿ 286.4 ಮಿ.ಮೀ ಮಳೆಯಾಗಿದೆ, ಇದು ಸಾಮಾನ್ಯ 74.8 ಮಿ.ಮೀಗಿಂತ ತುಂಬಾ ಹೆಚ್ಚು. ಒಂದೇ ದಿನದಲ್ಲಿ 71.3 ಮಿ.ಮೀ ವರೆಗೆ ಮಳೆಯಾಗಿದ್ದು, ಇಂತಹ ಪ್ರವಾಹಕ್ಕೆ ಕಾರಣವಾಗಬಹುದು.",
+          "model": "sample",
+          "facts": {
+            "rain_event_local_mm": 142.6,
+            "max_daily_rain_local_mm": 71.3,
+            "rain_week_region_mm": 286.4,
+            "normal_week_region_mm": 74.8,
+            "rain_month_local_mm": 512.0,
+            "normal_month_local_mm": 268.5,
+            "max_temp_c": 29.4,
+            "days_with_data": 10,
+            "region_km": 50,
+            "windows": {
+              "event_local": {
+                "start": "2019-08-04",
+                "end": "2019-08-08"
+              },
+              "week_region": {
+                "start": "2019-07-31",
+                "end": "2019-08-07"
+              },
+              "month_local": {
+                "start": "2019-07-08",
+                "end": "2019-08-07"
+              }
+            },
+            "source": "ERA5-Land daily weather (ECMWF / Copernicus)"
+          }
+        }
+      },
+      "area": {
+        "radius_km": 2,
+        "window_days": 7,
+        "nearby_reports": 0,
+        "nearby_farmers": 0,
+        "nearby_avg_damage": null,
+        "level": "isolated"
+      },
+      "severity": {
+        "score": 60,
+        "level": "moderate",
+        "reasons": [
+          "Plot damage score 86/100",
+          "No other farmers nearby have reported this event yet",
+          "A single report can't be rated severe until nearby reports confirm it"
+        ]
+      },
+      "images": {
+        "true_colour_before": "/mock/true_colour_before.svg",
+        "true_colour_now": "/mock/true_colour_after.svg",
+        "ndvi_now": "/mock/ndvi_after.svg",
+        "flood_mask": "/mock/flood_mask.svg"
+      },
+      "acquisitions": {
+        "before": "2019-07-31",
+        "now": "2019-08-15",
+        "satellite": "Sentinel-2"
+      },
+      "ndvi_series": {
+        "this_year": [
+          {
+            "day_offset": -27,
+            "date": "2019-07-11",
+            "ndvi": 0.61
+          },
+          {
+            "day_offset": -17,
+            "date": "2019-07-21",
+            "ndvi": 0.67
+          },
+          {
+            "day_offset": -7,
+            "date": "2019-07-31",
+            "ndvi": 0.7
+          },
+          {
+            "day_offset": 3,
+            "date": "2019-08-10",
+            "ndvi": 0.18
+          },
+          {
+            "day_offset": 8,
+            "date": "2019-08-15",
+            "ndvi": 0.12
+          }
+        ],
+        "baseline": []
+      },
+      "report": {
+        "generated_at": "2026-10-17T13:54:03Z",
+        "model": "sample (template)",
+        "summary_en": "Flood reported on 2019-08-07. Sentinel-2 satellite images of this field from 2019-07-31 and 2019-08-15 show severe damage (damage score 86/100): crop health fell by 83% and 90% of the field became newly covered by water. No other farmers within 2 km have reported this event yet. Both checks support the claim: the satellite images show damage, and the weather record shows conditions that can cause it. Case severity: moderate. This report is supporting evidence for your insurance claim, not an official loss assessment.",
+        "summary_kn": "2019-08-07 ರಂದು ಪ್ರವಾಹ ವರದಿಯಾಗಿದೆ. ಈ ಹೊಲದ 2019-07-31 ಮತ್ತು 2019-08-15 ರ Sentinel-2 ಉಪಗ್ರಹ ಚಿತ್ರಗಳ ಪ್ರಕಾರ ಹಾನಿಯ ಮಟ್ಟ: ತೀವ್ರ ಹಾನಿ (ಹಾನಿ ಅಂಕ 86/100). ಬೆಳೆಯ ಆರೋಗ್ಯ 83% ಕುಸಿದಿದೆ; ಹೊಲದ 90% ಭಾಗ ಹೊಸದಾಗಿ ನೀರಿನಲ್ಲಿ ಮುಳುಗಿದೆ. 2 ಕಿ.ಮೀ ಒಳಗೆ ಬೇರೆ ಯಾವ ರೈತರೂ ಈ ಘಟನೆಯನ್ನು ಇನ್ನೂ ವರದಿ ಮಾಡಿಲ್ಲ. ಎರಡೂ ಪರಿಶೀಲನೆಗಳು ಕ್ಲೇಮ್ ಅನ್ನು ಬೆಂಬಲಿಸುತ್ತವೆ: ಉಪಗ್ರಹ ಚಿತ್ರಗಳು ಹಾನಿಯನ್ನು ತೋರಿಸುತ್ತವೆ ಮತ್ತು ಹವಾಮಾನ ದಾಖಲೆಗಳು ಅದಕ್ಕೆ ಕಾರಣವಾಗಬಹುದಾದ ಪರಿಸ್ಥಿತಿಯನ್ನು ತೋರಿಸುತ್ತವೆ. ಪ್ರಕರಣದ ತೀವ್ರತೆ: ಮಧ್ಯಮ. ಈ ವರದಿ ನಿಮ್ಮ ವಿಮೆ ಕ್ಲೇಮ್‌ಗೆ ಪೂರಕ ಸಾಕ್ಷ್ಯ ಮಾತ್ರ, ಅಧಿಕೃತ ನಷ್ಟ ಮೌಲ್ಯಮಾಪನವಲ್ಲ.",
+        "findings": [
+          {
+            "title_en": "What the satellite images show",
+            "title_kn": "ಉಪಗ್ರಹ ಚಿತ್ರಗಳು ತೋರಿಸುವುದು",
+            "detail_en": "Between 2019-07-31 and 2019-08-15, crop health fell by 83% and 90% of the field became newly covered by water.",
+            "detail_kn": "2019-07-31 ಮತ್ತು 2019-08-15 ರ ನಡುವೆ ಬೆಳೆಯ ಆರೋಗ್ಯ 83% ಕುಸಿದಿದೆ; ಹೊಲದ 90% ಭಾಗ ಹೊಸದಾಗಿ ನೀರಿನಲ್ಲಿ ಮುಳುಗಿದೆ."
+          },
+          {
+            "title_en": "What the weather record shows",
+            "title_kn": "ಹವಾಮಾನ ದಾಖಲೆ ತೋರಿಸುವುದು",
+            "detail_en": "The region had 286.4 mm of rain in the week before the flood, far above the normal 74.8 mm, with up to 71.3 mm in a single day. Weather like this can cause the flooding reported.",
+            "detail_kn": "ಪ್ರವಾಹಕ್ಕೂ ಹಿಂದಿನ ವಾರ ಈ ಪ್ರದೇಶದಲ್ಲಿ 286.4 ಮಿ.ಮೀ ಮಳೆಯಾಗಿದೆ, ಇದು ಸಾಮಾನ್ಯ 74.8 ಮಿ.ಮೀಗಿಂತ ತುಂಬಾ ಹೆಚ್ಚು. ಒಂದೇ ದಿನದಲ್ಲಿ 71.3 ಮಿ.ಮೀ ವರೆಗೆ ಮಳೆಯಾಗಿದ್ದು, ಇಂತಹ ಪ್ರವಾಹಕ್ಕೆ ಕಾರಣವಾಗಬಹುದು."
+          },
+          {
+            "title_en": "Reports from nearby farmers",
+            "title_kn": "ಹತ್ತಿರದ ರೈತರ ವರದಿಗಳು",
+            "detail_en": "No other farmers within 2 km have reported this event yet.",
+            "detail_kn": "2 ಕಿ.ಮೀ ಒಳಗೆ ಬೇರೆ ಯಾವ ರೈತರೂ ಈ ಘಟನೆಯನ್ನು ಇನ್ನೂ ವರದಿ ಮಾಡಿಲ್ಲ."
+          }
+        ],
+        "confidence_reasons_kn": [
+          "ಘಟನೆಗೆ 1 ವಾರ ಮೊದಲಿನ ಸ್ಪಷ್ಟ Sentinel-2 ಚಿತ್ರ: 2019-07-31",
+          "ಇತ್ತೀಚಿನ ಸ್ಪಷ್ಟ Sentinel-2 ಚಿತ್ರ: 2019-08-15",
+          "ಜಮೀನು 131 ಉಪಗ್ರಹ ಪಿಕ್ಸೆಲ್‌ಗಳನ್ನು ಒಳಗೊಂಡಿದೆ (ಪ್ರತಿಯೊಂದು 10 ಮೀ)"
+        ],
+        "limitations_en": "Only two images are compared, so slow changes such as drought show less. Clouds can hide parts of a field. Each satellite pixel is 10 metres wide, so field edges are less precise. The crop type is as reported and was not checked from space.",
+        "limitations_kn": "ಕೇವಲ ಎರಡು ಚಿತ್ರಗಳನ್ನು ಹೋಲಿಸಲಾಗುತ್ತದೆ, ಆದ್ದರಿಂದ ಬರದಂತಹ ನಿಧಾನ ಬದಲಾವಣೆಗಳು ಕಡಿಮೆ ಕಾಣುತ್ತವೆ. ಮೋಡಗಳು ಹೊಲದ ಭಾಗಗಳನ್ನು ಮರೆಮಾಡಬಹುದು. ಪ್ರತಿ ಉಪಗ್ರಹ ಪಿಕ್ಸೆಲ್ 10 ಮೀಟರ್ ಅಗಲವಿರುವುದರಿಂದ ಹೊಲದ ಅಂಚುಗಳ ಅಳತೆ ಕಡಿಮೆ ನಿಖರವಾಗಿರುತ್ತದೆ. ಬೆಳೆಯ ಪ್ರಕಾರವನ್ನು ತಿಳಿಸಿದಂತೆ ಬರೆಯಲಾಗಿದೆ; ಅದನ್ನು ಉಪಗ್ರಹದಿಂದ ಪರಿಶೀಲಿಸಿಲ್ಲ.",
+        "recommended_next_steps_en": "Report the crop loss to your insurance company, bank or agriculture office within 72 hours of the event, as PMFBY requires, or as soon as possible if that time has passed. Attach this report and ask for a field inspection.",
+        "recommended_next_steps_kn": "PMFBY ನಿಯಮದಂತೆ ಘಟನೆ ನಡೆದ 72 ಗಂಟೆಗಳೊಳಗೆ ನಿಮ್ಮ ವಿಮಾ ಕಂಪನಿ, ಬ್ಯಾಂಕ್ ಅಥವಾ ಕೃಷಿ ಕಚೇರಿಗೆ ಬೆಳೆ ನಷ್ಟವನ್ನು ತಿಳಿಸಿ. ಆ ಸಮಯ ಕಳೆದಿದ್ದರೆ ಸಾಧ್ಯವಾದಷ್ಟು ಬೇಗ ತಿಳಿಸಿ. ಈ ವರದಿಯನ್ನು ಲಗತ್ತಿಸಿ ಮತ್ತು ಹೊಲ ಪರಿಶೀಲನೆಗೆ ಮನವಿ ಮಾಡಿ.",
+        "number_check": {
+          "ok": true,
+          "unexpected_percentages": []
+        }
+      },
+      "photo_check": null,
+      "evidence_hash": "sha256:53c326b0460f9fa49572005ae4d71ba4d69e06435e77852250f702b1d137fc61"
+    },
+    "plt_seed_3": {
+      "assessment_id": "asm_sampleplot3",
+      "source": "sample",
+      "created_at": "2026-10-17T13:54:03Z",
+      "plot": {
+        "plot_id": "plt_seed_3",
+        "farmer_id": "KA-DEMO-001",
+        "survey_number": "124/2",
+        "farmer_name": "Ramesh",
+        "village": "Athani taluk",
+        "crop": "maize",
+        "area_ha": 1.31,
+        "area_pixels": 131,
+        "centroid": {
+          "lat": 16.7124,
+          "lng": 75.0831
+        },
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                75.08255,
+                16.7119
+              ],
+              [
+                75.08365,
+                16.7119
+              ],
+              [
+                75.08365,
+                16.7129
+              ],
+              [
+                75.08255,
+                16.7129
+              ],
+              [
+                75.08255,
+                16.7119
+              ]
+            ]
+          ]
+        }
+      },
+      "event": {
+        "type": "flood",
+        "date": "2019-03-12",
+        "windows": {
+          "before": {
+            "start": "2019-02-28",
+            "end": "2019-03-09"
+          },
+          "before_target": "2019-03-05",
+          "now": {
+            "start": "2019-03-12",
+            "end": "2019-03-26"
+          },
+          "series": {
+            "start": "2019-02-10",
+            "end": "2019-03-26"
+          }
+        }
+      },
+      "metrics": {
+        "ndvi_before": 0.55,
+        "ndvi_now": 0.52,
+        "ndvi_loss": 0.055,
+        "water_before": 0.01,
+        "water_now": 0.01,
+        "flood_fraction": 0.0,
+        "before_image_date": "2019-03-05",
+        "now_image_date": "2019-03-20",
+        "before_clear": 0.97,
+        "now_clear": 0.95,
+        "days_between": 15
+      },
+      "score": {
+        "damage_score": 3,
+        "damage_level": "none"
+      },
+      "confidence": {
+        "level": "high",
+        "reasons": [
+          "Clear Sentinel-2 image 1 week before: 2019-03-05",
+          "Clear Sentinel-2 image now: 2019-03-20",
+          "Plot covers 131 satellite pixels (10 m each)"
+        ]
+      },
+      "verification": {
+        "status": "not_supported",
+        "satellite": {
+          "passed": false,
+          "reason": "The satellite images show no clear damage on this plot."
+        },
+        "weather": {
+          "verdict": "not_supported",
+          "rule_verdict": "not_supported",
+          "rule_reason": "Only 1.8 mm of rain across the region in the week before.",
+          "explanation_en": "The region had only 1.8 mm of rain in the week before the reported flood, and at most 0.6 mm in a day. There was no heavy rain at that time that could cause a flood.",
+          "explanation_kn": "ವರದಿಯಾದ ಪ್ರವಾಹಕ್ಕೂ ಹಿಂದಿನ ವಾರ ಪ್ರದೇಶದಲ್ಲಿ ಕೇವಲ 1.8 ಮಿ.ಮೀ ಮಳೆಯಾಗಿದೆ, ಒಂದು ದಿನದಲ್ಲಿ ಗರಿಷ್ಠ 0.6 ಮಿ.ಮೀ. ಆ ಸಮಯದಲ್ಲಿ ಪ್ರವಾಹಕ್ಕೆ ಕಾರಣವಾಗುವಷ್ಟು ಭಾರೀ ಮಳೆ ಇರಲಿಲ್ಲ.",
+          "model": "sample",
+          "facts": {
+            "rain_event_local_mm": 0.4,
+            "max_daily_rain_local_mm": 0.6,
+            "rain_week_region_mm": 1.8,
+            "normal_week_region_mm": 3.1,
+            "rain_month_local_mm": 4.2,
+            "normal_month_local_mm": 9.8,
+            "max_temp_c": 36.8,
+            "days_with_data": 10,
+            "region_km": 50,
+            "windows": {
+              "event_local": {
+                "start": "2019-03-09",
+                "end": "2019-03-13"
+              },
+              "week_region": {
+                "start": "2019-03-05",
+                "end": "2019-03-12"
+              },
+              "month_local": {
+                "start": "2019-02-10",
+                "end": "2019-03-12"
+              }
+            },
+            "source": "ERA5-Land daily weather (ECMWF / Copernicus)"
+          }
+        }
+      },
+      "area": {
+        "radius_km": 2,
+        "window_days": 7,
+        "nearby_reports": 0,
+        "nearby_farmers": 0,
+        "nearby_avg_damage": null,
+        "level": "isolated"
+      },
+      "severity": {
+        "score": 2,
+        "level": "none",
+        "reasons": [
+          "Plot damage score 3/100",
+          "No other farmers nearby have reported this event yet"
+        ]
+      },
+      "images": {
+        "true_colour_before": "/mock/true_colour_before.svg",
+        "true_colour_now": "/mock/true_colour_before.svg"
+      },
+      "acquisitions": {
+        "before": "2019-03-05",
+        "now": "2019-03-20",
+        "satellite": "Sentinel-2"
+      },
+      "ndvi_series": {
+        "this_year": [
+          {
+            "day_offset": -27,
+            "date": "2019-02-13",
+            "ndvi": 0.53
+          },
+          {
+            "day_offset": -17,
+            "date": "2019-02-23",
+            "ndvi": 0.56
+          },
+          {
+            "day_offset": -7,
+            "date": "2019-03-05",
+            "ndvi": 0.55
+          },
+          {
+            "day_offset": 3,
+            "date": "2019-03-15",
+            "ndvi": 0.53
+          },
+          {
+            "day_offset": 8,
+            "date": "2019-03-20",
+            "ndvi": 0.52
+          }
+        ],
+        "baseline": []
+      },
+      "report": {
+        "generated_at": "2026-10-17T13:54:03Z",
+        "model": "sample (template)",
+        "summary_en": "Flood reported on 2019-03-12. Sentinel-2 satellite images of this field from 2019-03-05 and 2019-03-20 show no clear damage (damage score 3/100): crop health fell by 6% and no part of the field became newly covered by water. No other farmers within 2 km have reported this event yet. Neither the satellite images nor the weather record support this claim. Case severity: minimal. This report is supporting evidence for your insurance claim, not an official loss assessment.",
+        "summary_kn": "2019-03-12 ರಂದು ಪ್ರವಾಹ ವರದಿಯಾಗಿದೆ. ಈ ಹೊಲದ 2019-03-05 ಮತ್ತು 2019-03-20 ರ Sentinel-2 ಉಪಗ್ರಹ ಚಿತ್ರಗಳ ಪ್ರಕಾರ ಹಾನಿಯ ಮಟ್ಟ: ಸ್ಪಷ್ಟ ಹಾನಿ ಇಲ್ಲ (ಹಾನಿ ಅಂಕ 3/100). ಬೆಳೆಯ ಆರೋಗ್ಯ 6% ಕುಸಿದಿದೆ; ಹೊಲದ ಯಾವ ಭಾಗವೂ ಹೊಸದಾಗಿ ನೀರಿನಲ್ಲಿ ಮುಳುಗಿಲ್ಲ. 2 ಕಿ.ಮೀ ಒಳಗೆ ಬೇರೆ ಯಾವ ರೈತರೂ ಈ ಘಟನೆಯನ್ನು ಇನ್ನೂ ವರದಿ ಮಾಡಿಲ್ಲ. ಉಪಗ್ರಹ ಚಿತ್ರಗಳು ಅಥವಾ ಹವಾಮಾನ ದಾಖಲೆಗಳು ಈ ಕ್ಲೇಮ್ ಅನ್ನು ಬೆಂಬಲಿಸುವುದಿಲ್ಲ. ಪ್ರಕರಣದ ತೀವ್ರತೆ: ಕನಿಷ್ಠ. ಈ ವರದಿ ನಿಮ್ಮ ವಿಮೆ ಕ್ಲೇಮ್‌ಗೆ ಪೂರಕ ಸಾಕ್ಷ್ಯ ಮಾತ್ರ, ಅಧಿಕೃತ ನಷ್ಟ ಮೌಲ್ಯಮಾಪನವಲ್ಲ.",
+        "findings": [
+          {
+            "title_en": "What the satellite images show",
+            "title_kn": "ಉಪಗ್ರಹ ಚಿತ್ರಗಳು ತೋರಿಸುವುದು",
+            "detail_en": "Between 2019-03-05 and 2019-03-20, crop health fell by 6% and no part of the field became newly covered by water.",
+            "detail_kn": "2019-03-05 ಮತ್ತು 2019-03-20 ರ ನಡುವೆ ಬೆಳೆಯ ಆರೋಗ್ಯ 6% ಕುಸಿದಿದೆ; ಹೊಲದ ಯಾವ ಭಾಗವೂ ಹೊಸದಾಗಿ ನೀರಿನಲ್ಲಿ ಮುಳುಗಿಲ್ಲ."
+          },
+          {
+            "title_en": "What the weather record shows",
+            "title_kn": "ಹವಾಮಾನ ದಾಖಲೆ ತೋರಿಸುವುದು",
+            "detail_en": "The region had only 1.8 mm of rain in the week before the reported flood, and at most 0.6 mm in a day. There was no heavy rain at that time that could cause a flood.",
+            "detail_kn": "ವರದಿಯಾದ ಪ್ರವಾಹಕ್ಕೂ ಹಿಂದಿನ ವಾರ ಪ್ರದೇಶದಲ್ಲಿ ಕೇವಲ 1.8 ಮಿ.ಮೀ ಮಳೆಯಾಗಿದೆ, ಒಂದು ದಿನದಲ್ಲಿ ಗರಿಷ್ಠ 0.6 ಮಿ.ಮೀ. ಆ ಸಮಯದಲ್ಲಿ ಪ್ರವಾಹಕ್ಕೆ ಕಾರಣವಾಗುವಷ್ಟು ಭಾರೀ ಮಳೆ ಇರಲಿಲ್ಲ."
+          },
+          {
+            "title_en": "Reports from nearby farmers",
+            "title_kn": "ಹತ್ತಿರದ ರೈತರ ವರದಿಗಳು",
+            "detail_en": "No other farmers within 2 km have reported this event yet.",
+            "detail_kn": "2 ಕಿ.ಮೀ ಒಳಗೆ ಬೇರೆ ಯಾವ ರೈತರೂ ಈ ಘಟನೆಯನ್ನು ಇನ್ನೂ ವರದಿ ಮಾಡಿಲ್ಲ."
+          }
+        ],
+        "confidence_reasons_kn": [
+          "ಘಟನೆಗೆ 1 ವಾರ ಮೊದಲಿನ ಸ್ಪಷ್ಟ Sentinel-2 ಚಿತ್ರ: 2019-03-05",
+          "ಇತ್ತೀಚಿನ ಸ್ಪಷ್ಟ Sentinel-2 ಚಿತ್ರ: 2019-03-20",
+          "ಜಮೀನು 131 ಉಪಗ್ರಹ ಪಿಕ್ಸೆಲ್‌ಗಳನ್ನು ಒಳಗೊಂಡಿದೆ (ಪ್ರತಿಯೊಂದು 10 ಮೀ)"
+        ],
+        "limitations_en": "Only two images are compared, so slow changes such as drought show less. Clouds can hide parts of a field. Each satellite pixel is 10 metres wide, so field edges are less precise. The crop type is as reported and was not checked from space.",
+        "limitations_kn": "ಕೇವಲ ಎರಡು ಚಿತ್ರಗಳನ್ನು ಹೋಲಿಸಲಾಗುತ್ತದೆ, ಆದ್ದರಿಂದ ಬರದಂತಹ ನಿಧಾನ ಬದಲಾವಣೆಗಳು ಕಡಿಮೆ ಕಾಣುತ್ತವೆ. ಮೋಡಗಳು ಹೊಲದ ಭಾಗಗಳನ್ನು ಮರೆಮಾಡಬಹುದು. ಪ್ರತಿ ಉಪಗ್ರಹ ಪಿಕ್ಸೆಲ್ 10 ಮೀಟರ್ ಅಗಲವಿರುವುದರಿಂದ ಹೊಲದ ಅಂಚುಗಳ ಅಳತೆ ಕಡಿಮೆ ನಿಖರವಾಗಿರುತ್ತದೆ. ಬೆಳೆಯ ಪ್ರಕಾರವನ್ನು ತಿಳಿಸಿದಂತೆ ಬರೆಯಲಾಗಿದೆ; ಅದನ್ನು ಉಪಗ್ರಹದಿಂದ ಪರಿಶೀಲಿಸಿಲ್ಲ.",
+        "recommended_next_steps_en": "Report the crop loss to your insurance company, bank or agriculture office within 72 hours of the event, as PMFBY requires, or as soon as possible if that time has passed. Attach this report and ask for a field inspection.",
+        "recommended_next_steps_kn": "PMFBY ನಿಯಮದಂತೆ ಘಟನೆ ನಡೆದ 72 ಗಂಟೆಗಳೊಳಗೆ ನಿಮ್ಮ ವಿಮಾ ಕಂಪನಿ, ಬ್ಯಾಂಕ್ ಅಥವಾ ಕೃಷಿ ಕಚೇರಿಗೆ ಬೆಳೆ ನಷ್ಟವನ್ನು ತಿಳಿಸಿ. ಆ ಸಮಯ ಕಳೆದಿದ್ದರೆ ಸಾಧ್ಯವಾದಷ್ಟು ಬೇಗ ತಿಳಿಸಿ. ಈ ವರದಿಯನ್ನು ಲಗತ್ತಿಸಿ ಮತ್ತು ಹೊಲ ಪರಿಶೀಲನೆಗೆ ಮನವಿ ಮಾಡಿ.",
+        "number_check": {
+          "ok": true,
+          "unexpected_percentages": []
+        }
+      },
+      "photo_check": null,
+      "evidence_hash": "sha256:405ed8c8a60b0e3a0d6c6b1c8a5736a3e2f7c36a2ea50ddfb3c396fc1e7dccd2"
+    }
+  }
+}

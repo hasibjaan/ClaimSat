@@ -25,7 +25,10 @@ function popupHtml(plot) {
   const lines = [
     `<strong>${escapeHtml(LEVEL_LABELS[plot.damage_level] ?? plot.damage_level)}</strong> · score ${plot.damage_score ?? "—"}`,
     `${escapeHtml(plot.confidence)} confidence`,
-    plot.flood_fraction != null ? `Flooded: ${Math.round(plot.flood_fraction * 100)}%` : null,
+    plot.severity_level ? `Case severity: ${escapeHtml(LEVEL_LABELS[plot.severity_level] ?? plot.severity_level)}` : null,
+    plot.verification_status ? `Verification: ${escapeHtml(plot.verification_status.replace("_", " "))}` : null,
+    plot.nearby_farmers != null ? `Nearby reports: ${escapeHtml(plot.nearby_farmers)}` : null,
+    plot.flood_fraction != null ? `Newly under water: ${Math.round(plot.flood_fraction * 100)}%` : null,
     plot.ndvi_loss != null ? `Crop health lost: ${Math.round(plot.ndvi_loss * 100)}%` : null,
     plot.farmer_name ? `Farmer: ${escapeHtml(plot.farmer_name)}` : null,
     plot.survey_number ? `Survey no. ${escapeHtml(plot.survey_number)}` : null,

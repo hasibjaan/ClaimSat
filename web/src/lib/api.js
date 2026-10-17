@@ -3,7 +3,7 @@
 // the UI before the backend has Google Cloud access).
 
 import sampleResult from "./sampleResult.json";
-import { MOCK_REPORT, mockDashboard, mockFarmerPlots, mockPlots, mockRegister, mockResult } from "./mockData";
+import { mockAssessment, mockDashboard, mockFarmerPlots, mockPlots, mockRegister, mockResult } from "./mockData";
 import { getOfficerCode } from "./officer";
 
 const MOCK = process.env.NEXT_PUBLIC_MOCK_API === "1";
@@ -90,10 +90,6 @@ export async function registerPlot(body) {
   });
 }
 
-function mockAssessment(id, report = null) {
-  return { ...sampleResult, assessment_id: id, source: "sample", images: mockResult({}).images, report };
-}
-
 export async function getAssessment(id) {
   if (MOCK) return mockAssessment(id);
   return request(`/assessments/${encodeURIComponent(id)}`);
@@ -103,7 +99,7 @@ export async function getAssessment(id) {
 export async function generateReport(id, { refresh = false } = {}) {
   if (MOCK) {
     await wait(2500);
-    return mockAssessment(id, MOCK_REPORT);
+    return mockAssessment(id);
   }
   return request(`/report/${encodeURIComponent(id)}${refresh ? "?refresh=true" : ""}`, { method: "POST" });
 }
@@ -135,8 +131,8 @@ export async function checkPhoto(assessmentId, file) {
         flag_messages: [],
         what_photo_shows: "standing_water",
         consistent: true,
-        observations_en: "Sample text: the photo shows standing water across the field, which agrees with the radar finding that most of the field was flooded.",
-        observations_kn: "ಮಾದರಿ ಪಠ್ಯ: ಫೋಟೋದಲ್ಲಿ ಹೊಲದ ತುಂಬಾ ನಿಂತ ನೀರು ಕಾಣುತ್ತದೆ. ಇದು ಹೊಲದ ಹೆಚ್ಚಿನ ಭಾಗ ಜಲಾವೃತವಾಗಿತ್ತು ಎಂಬ ರಾಡಾರ್ ಫಲಿತಾಂಶಕ್ಕೆ ಹೊಂದಿಕೆಯಾಗುತ್ತದೆ.",
+        observations_en: "Sample text: the photo shows standing water across the field, which agrees with the satellite finding that most of the field was newly under water.",
+        observations_kn: "ಮಾದರಿ ಪಠ್ಯ: ಫೋಟೋದಲ್ಲಿ ಹೊಲದ ತುಂಬಾ ನಿಂತ ನೀರು ಕಾಣುತ್ತದೆ. ಇದು ಹೊಲದ ಹೆಚ್ಚಿನ ಭಾಗ ಹೊಸದಾಗಿ ನೀರಿನಲ್ಲಿ ಮುಳುಗಿತ್ತು ಎಂಬ ಉಪಗ್ರಹ ಫಲಿತಾಂಶಕ್ಕೆ ಹೊಂದಿಕೆಯಾಗುತ್ತದೆ.",
       },
     };
   }

@@ -11,13 +11,14 @@ from tests.test_validation import square
 
 FAKE_ANALYSIS = {
     "event": {"type": "flood", "date": "2019-08-07", "windows": {}},
-    "plot_stats": {"area_ha": 1.18, "area_pixels": 118, "centroid": {"lat": 16.73, "lng": 75.06}},
+    "plot_stats": {"area_ha": 1.18, "area_pixels": 118, "centroid": {"lat": 16.7323, "lng": 75.0584}},
     "metrics": {
-        "ndvi_before": 0.7, "ndvi_after": 0.25, "ndvi_baseline_after": 0.68, "ndvi_loss": 0.632,
-        "flood_fraction": 0.8, "rain_deficit": None, "season_rain_mm": None, "baseline_rain_mm": None,
-        "crop_fraction": 0.8, "clear_obs_before": 3, "clear_obs_after": 4, "radar_obs_pre": 2, "radar_obs_post": 1,
+        "ndvi_before": 0.7, "ndvi_now": 0.25, "ndvi_loss": 0.632,
+        "water_before": 0.02, "water_now": 0.85, "flood_fraction": 0.8,
+        "before_image_date": "2019-07-31", "now_image_date": "2019-08-15",
+        "before_clear": 0.94, "now_clear": 0.88, "days_between": 15,
     },
-    "acquisitions": {"s2_before": [], "s2_after": [], "s1_pre": [], "s1_post": []},
+    "acquisitions": {"before": "2019-07-31", "now": "2019-08-15", "satellite": "Sentinel-2"},
     "ndvi_series": {"this_year": [], "baseline": []},
 }
 
@@ -71,7 +72,7 @@ def test_assess_returns_contract_shape_and_stores_everything(client):
 def test_invalid_input_gives_a_readable_422(client):
     response = client.post("/api/assess", json={**BODY, "event_date": "2099-01-01"})
     assert response.status_code == 422
-    assert "at least 7 days ago" in response.json()["error"]
+    assert "before today" in response.json()["error"]
 
 
 def test_analysis_failure_without_demo_mode_is_502(client, monkeypatch):
@@ -146,7 +147,7 @@ def test_unregistered_plot_is_rejected(client):
 def test_demo_plots_are_registered_to_demo_farmers(client, tmp_path):
     _write_demo_cache(tmp_path)
     plots = client.get("/api/farmers/ka-demo-001/plots").json()["plots"]
-    assert {p["plot_id"] for p in plots} == {"plt_seed_1", "plt_seed_2", "plt_flood1"}
+    assert {p["plot_id"] for p in plots} == {"plt_seed_1", "plt_seed_2", "plt_seed_3", "plt_flood1"}
     flood1 = next(p for p in plots if p["plot_id"] == "plt_flood1")
     assert flood1["default_event"] == {"event_type": "flood", "event_date": "2019-08-07"}
 
@@ -158,18 +159,22 @@ def test_asset_paths_are_restricted(client):
 
 
 def test_demo_mode_sample_fallback_for_seed_plots(client, monkeypatch):
-    # No precomputed results exist: the seed plots fall back to the labelled sample.
+    # No precomputed results exist: each seed plot falls back to its labelled sample.
     monkeypatch.setattr(config, "DEMO_MODE", True)
     monkeypatch.setattr(ee_analysis, "assess", lambda *a: (_ for _ in ()).throw(RuntimeError("no credentials")))
-    result = client.post("/api/assess", json={**BODY, "plot_id": "plt_seed_2"}).json()
-    assert result["source"] == "sample"
-    assert result["plot"]["plot_id"] == "plt_seed_2" and result["plot"]["survey_number"] == "118/1"
-    assert result["plot"]["geometry"]["coordinates"][0][0] == [75.0625, 16.7315]
-    assert result["report"]["summary_en"]  # report bundled, no Gemini call needed
-    # Stored, so the report page and photo check can load it.
-    stored = client.get(f"/api/assessments/{result['assessment_id']}").json()
-    assert stored["plot"]["plot_id"] == "plt_seed_2"
-    assert client.post(f"/api/report/{result['assessment_id']}").json()["report"]["summary_en"]
+    expected = {
+        "plt_seed_1": ("2019-08-07", "verified", "severe"),
+        "plt_seed_2": ("2019-08-07", "verified", "moderate"),   # no nearby reports
+        "plt_seed_3": ("2019-03-12", "not_supported", "none"),  # dry-season "flood"
+    }
+    for plot_id, (day, status, severity) in expected.items():
+        result = client.post("/api/assess", json={**BODY, "plot_id": plot_id, "event_date": day}).json()
+        assert result["source"] == "sample" and result["plot"]["plot_id"] == plot_id
+        assert result["verification"]["status"] == status
+        assert result["severity"]["level"] == severity
+        assert result["report"]["summary_en"]  # report bundled, no Gemini call needed
+        # Stored, so the report page and photo check can load it.
+        assert client.get(f"/api/assessments/{result['assessment_id']}").json()["plot"]["plot_id"] == plot_id
 
 
 def test_no_sample_fallback_outside_demo_mode_or_for_real_plots(client, monkeypatch):

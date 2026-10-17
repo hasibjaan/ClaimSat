@@ -16,16 +16,7 @@ export default function AssessForm({ values, onValuesChange, onSubmit, serverErr
   const [submitted, setSubmitted] = useState(false);
 
   const set = (field) => (e) => onValuesChange({ ...values, [field]: e.target.value });
-  const setSeason = (field) => (e) =>
-    onValuesChange({ ...values, season: { ...values.season, [field]: e.target.value } });
-
-  const errors = {
-    date: dateError(values.event_date),
-    season:
-      values.event_type === "drought" && values.season.start && values.season.end && values.season.start >= values.season.end
-        ? "The season must end after it starts."
-        : null,
-  };
+  const errors = { date: dateError(values.event_date) };
   const hasErrors = Object.values(errors).some(Boolean);
 
   const submit = (e) => {
@@ -80,17 +71,9 @@ export default function AssessForm({ values, onValuesChange, onSubmit, serverErr
         {show("date") && <p className="mt-1 text-sm text-danger">{errors.date}</p>}
       </div>
 
-      {values.event_type === "drought" && (
-        <div>
-          <p className={labelClass}>Season to compare (optional)</p>
-          <p className="text-sm text-ink-muted">Leave blank to use 1 June to 30 September.</p>
-          <div className="mt-1 grid grid-cols-2 gap-2">
-            <input type="date" aria-label="Season start" value={values.season.start} onChange={setSeason("start")} className={inputClass} />
-            <input type="date" aria-label="Season end" value={values.season.end} onChange={setSeason("end")} className={inputClass} />
-          </div>
-          {show("season") && <p className="mt-1 text-sm text-danger">{errors.season}</p>}
-        </div>
-      )}
+      <p className="text-xs text-ink-muted">
+        We compare a satellite image from about 1 week before this date with the latest image of your field.
+      </p>
 
       <div>
         <label htmlFor="crop" className={labelClass}>Crop this season</label>

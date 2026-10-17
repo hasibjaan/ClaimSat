@@ -32,15 +32,20 @@ ASSESSMENTS_SCHEMA = [
     bigquery.SchemaField("event_type", "STRING"),
     bigquery.SchemaField("event_date", "DATE"),
     bigquery.SchemaField("ndvi_before", "FLOAT64"),
-    bigquery.SchemaField("ndvi_after", "FLOAT64"),
-    bigquery.SchemaField("ndvi_baseline_after", "FLOAT64"),
+    bigquery.SchemaField("ndvi_now", "FLOAT64"),
     bigquery.SchemaField("ndvi_loss", "FLOAT64"),
+    bigquery.SchemaField("water_now", "FLOAT64"),
     bigquery.SchemaField("flood_fraction", "FLOAT64"),
-    bigquery.SchemaField("rain_deficit", "FLOAT64"),
-    bigquery.SchemaField("crop_fraction", "FLOAT64"),
+    bigquery.SchemaField("before_image_date", "DATE"),
+    bigquery.SchemaField("now_image_date", "DATE"),
     bigquery.SchemaField("damage_score", "FLOAT64"),
     bigquery.SchemaField("damage_level", "STRING"),
     bigquery.SchemaField("confidence", "STRING"),
+    bigquery.SchemaField("severity_score", "FLOAT64"),
+    bigquery.SchemaField("severity_level", "STRING"),
+    bigquery.SchemaField("nearby_farmers", "INT64"),
+    bigquery.SchemaField("verification_status", "STRING"),
+    bigquery.SchemaField("weather_verdict", "STRING"),
     bigquery.SchemaField("evidence_hash", "STRING"),
     bigquery.SchemaField("source", "STRING"),
     bigquery.SchemaField("created_at", "TIMESTAMP"),
@@ -59,9 +64,10 @@ def view_sql():
 CREATE OR REPLACE VIEW `{table("v_dashboard")}` AS
 SELECT
   a.assessment_id, a.plot_id, p.farmer_id, p.survey_number, p.farmer_name, p.village, p.crop, p.geom, p.area_ha,
-  a.event_type, a.event_date, a.ndvi_before, a.ndvi_after, a.ndvi_baseline_after,
-  a.ndvi_loss, a.flood_fraction, a.rain_deficit, a.crop_fraction,
-  a.damage_score, a.damage_level, a.confidence, a.evidence_hash, a.source,
+  a.event_type, a.event_date, a.ndvi_before, a.ndvi_now, a.ndvi_loss, a.water_now, a.flood_fraction,
+  a.before_image_date, a.now_image_date, a.damage_score, a.damage_level, a.confidence,
+  a.severity_score, a.severity_level, a.nearby_farmers, a.verification_status, a.weather_verdict,
+  a.evidence_hash, a.source,
   a.created_at AS assessed_at
 FROM `{table("assessments")}` AS a
 -- A registered plot is written again with each assessment: keep its latest row.
@@ -115,14 +121,16 @@ def rows_for(result):
         "event_date": result["event"]["date"],
         **{
             k: metrics.get(k)
-            for k in (
-                "ndvi_before", "ndvi_after", "ndvi_baseline_after", "ndvi_loss",
-                "flood_fraction", "rain_deficit", "crop_fraction",
-            )
+            for k in ("ndvi_before", "ndvi_now", "ndvi_loss", "water_now", "flood_fraction", "before_image_date", "now_image_date")
         },
         "damage_score": result["score"]["damage_score"],
         "damage_level": result["score"]["damage_level"],
         "confidence": result["confidence"]["level"],
+        "severity_score": (result.get("severity") or {}).get("score"),
+        "severity_level": (result.get("severity") or {}).get("level"),
+        "nearby_farmers": (result.get("area") or {}).get("nearby_farmers"),
+        "verification_status": (result.get("verification") or {}).get("status"),
+        "weather_verdict": ((result.get("verification") or {}).get("weather") or {}).get("verdict"),
         "evidence_hash": result.get("evidence_hash"),
         "source": result.get("source"),
         "created_at": created_at,
@@ -133,9 +141,11 @@ def rows_for(result):
 def summarise(plots):
     """Summary cards and the 'visit first' order for the dashboard."""
     affected = [p for p in plots if p["damage_level"] in AFFECTED_LEVELS]
+    # Reported cases rank by case severity; survey plots (no severity) by damage.
+    rank = lambda p: p.get("severity_score") if p.get("severity_score") is not None else p.get("damage_score")  # noqa: E731
     visit_first = sorted(
-        (p for p in plots if p.get("damage_score") is not None),
-        key=lambda p: (-p["damage_score"], CONFIDENCE_RANK.get(p.get("confidence"), 3)),
+        (p for p in plots if rank(p) is not None),
+        key=lambda p: (-rank(p), CONFIDENCE_RANK.get(p.get("confidence"), 3)),
     )
     return {
         "summary": {
@@ -191,7 +201,8 @@ def dashboard(limit=1000):
 SELECT
   assessment_id, plot_id, farmer_id, survey_number, farmer_name, village, crop, area_ha, event_type,
   CAST(event_date AS STRING) AS event_date, damage_score, damage_level, confidence,
-  ndvi_loss, flood_fraction, rain_deficit, source,
+  severity_score, severity_level, nearby_farmers, verification_status,
+  ndvi_loss, flood_fraction, source,
   FORMAT_TIMESTAMP('%FT%TZ', assessed_at) AS assessed_at,
   ST_ASGEOJSON(geom) AS geojson
 FROM `{table("v_dashboard")}`

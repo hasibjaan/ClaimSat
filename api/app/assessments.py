@@ -11,12 +11,12 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-from app import config, ee_analysis, photo_check, plots, report, scoring, storage, validation, warehouse
+from app import area, config, ee_analysis, photo_check, plots, report, report_template, scoring, storage, validation, warehouse, weather_check
 
 log = logging.getLogger("claimsat")
 
 DEMO_CACHE = Path(__file__).resolve().parent.parent / "demo_cache"
-SAMPLE_RESULT = Path(__file__).resolve().parent / "sample_demo_result.json"
+SAMPLE_RESULTS = Path(__file__).resolve().parent / "sample_results.json"  # scripts/build_samples.py
 LIVE_TIMEOUT_DEMO_S = 45   # in DEMO_MODE, fall back to the cache after this
 LIVE_TIMEOUT_S = 85        # otherwise give up after this (the web proxy waits 90 s)
 CACHE_MATCH_M = 30         # a plot matches a demo plot if centroids are this close
@@ -48,15 +48,36 @@ def evidence_hash(result):
         "metrics": result["metrics"],
         "score": result["score"],
         "acquisitions": result["acquisitions"],
+        "verification": result.get("verification"),
+        "area": result.get("area"),
+        "severity": result.get("severity"),
     }
     canonical = json.dumps(evidence, sort_keys=True, separators=(",", ":"))
     return "sha256:" + hashlib.sha256(canonical.encode()).hexdigest()
 
 
-def build_result(assessment_id, request, area_ha, analysis, images, source):
+def build_result(assessment_id, request, area_ha, analysis, images, source, weather=None, nearby=None):
+    """Assemble the result: damage, two-step verification and case severity.
+
+    weather: the step-2 result from weather_check.check (None = unavailable).
+    nearby:  other farmers' reports from area.nearby.
+    """
     scored = scoring.score_assessment(
         analysis["event"]["type"], analysis["metrics"], analysis["plot_stats"]["area_pixels"]
     )
+    satellite = scoring.satellite_step(scored["score"], scored["confidence"])
+    weather = weather or {
+        "verdict": "uncertain",
+        "rule_verdict": "uncertain",
+        "rule_reason": "Weather data couldn't be loaded.",
+        "explanation_en": "Weather data couldn't be loaded, so the weather check is pending.",
+        "explanation_kn": None,
+        "model": None,
+        "facts": None,
+    }
+    status = scoring.verification_status(satellite["passed"], weather["verdict"])
+    nearby = nearby or {"radius_km": config.NEARBY_RADIUS_KM, "window_days": config.NEARBY_WINDOW_DAYS,
+                        "nearby_reports": 0, "nearby_farmers": 0, "nearby_avg_damage": None, "level": "isolated"}
     result = {
         "assessment_id": assessment_id,
         "source": source,
@@ -77,6 +98,9 @@ def build_result(assessment_id, request, area_ha, analysis, images, source):
         "metrics": analysis["metrics"],
         "score": scored["score"],
         "confidence": scored["confidence"],
+        "verification": {"status": status, "satellite": satellite, "weather": weather},
+        "area": nearby,
+        "severity": scoring.severity(scored["score"]["damage_score"], nearby, status),
         "images": {name: f"/api/assets/{assessment_id}/{name}.png" for name in images},
         "acquisitions": analysis["acquisitions"],
         "ndvi_series": analysis["ndvi_series"],
@@ -105,8 +129,8 @@ def find_cached(geometry, event_type, plot_id=None):
     """A saved result to fall back on in DEMO_MODE.
 
     First a precomputed result (scripts/precompute_demo.py) for a demo plot at
-    this location; else, for the sample seed plots only, the bundled sample
-    result, which is marked source=sample and labelled as sample data in the UI.
+    this location; else, for the sample seed plots only, that plot's bundled
+    sample result, which is marked source=sample and labelled as sample data.
     """
     centroid = validation.ring_centroid(geometry["coordinates"][0])
     for plot in demo_plots():
@@ -119,10 +143,10 @@ def find_cached(geometry, event_type, plot_id=None):
                 cached = json.loads(path.read_text())
                 cached["source"] = "cache"
                 return cached
-    if plot_id and plot_id.startswith("plt_seed_") and event_type == "flood":
-        sample = json.loads(SAMPLE_RESULT.read_text())
-        sample.pop("_note", None)
-        return sample
+    if plot_id and plot_id.startswith("plt_seed_"):
+        sample = json.loads(SAMPLE_RESULTS.read_text())["results"].get(plot_id)
+        if sample and sample["event"]["type"] == event_type:
+            return sample
     return None
 
 
@@ -181,14 +205,15 @@ async def run(body):
     """Validate, analyse, store and return one assessment."""
     request = validate_request(body)
     assessment_id = "asm_" + uuid.uuid4().hex[:12]
-    args = (request["geometry"], request["event_type"], request["event_date"], request["season_window"])
+    args = (request["geometry"], request["event_type"], request["event_date"])
     timeout = LIVE_TIMEOUT_DEMO_S if config.DEMO_MODE else LIVE_TIMEOUT_S
 
     try:
-        analysis, thumbs = await asyncio.wait_for(
+        analysis, thumbs, facts = await asyncio.wait_for(
             asyncio.gather(
                 asyncio.to_thread(ee_analysis.assess, *args),
                 asyncio.to_thread(ee_analysis.thumbnails, *args),
+                asyncio.to_thread(ee_analysis.weather_facts, *args),
                 return_exceptions=True,
             ),
             timeout,
@@ -220,9 +245,25 @@ async def run(body):
             except Exception as exc:
                 log.warning("Saving thumbnail %s failed: %s", name, exc)
 
-    result = build_result(assessment_id, request, request["area_ha"], analysis, images, "live")
+    # Step 2 of verification: Gemini checks the claim against the weather record.
+    if isinstance(facts, BaseException):
+        log.warning("Weather facts failed: %s", facts)
+        facts = None
+    weather = await asyncio.to_thread(
+        weather_check.check, request["event_type"], request["event_date"].isoformat(), facts
+    )
+
+    # Case severity: how many other farmers nearby reported the same event.
+    centroid = analysis["plot_stats"]["centroid"]
+    nearby = await asyncio.to_thread(
+        area.nearby, centroid["lat"], centroid["lng"], request["farmer_id"],
+        request["event_type"], request["event_date"].isoformat(),
+    )
+
+    result = build_result(assessment_id, request, request["area_ha"], analysis, images, "live", weather, nearby)
     try:
         storage.save_json(f"assessments/{assessment_id}.json", result)
+        area.record(result)
     except Exception as exc:
         log.warning("Saving assessment %s failed: %s", assessment_id, exc)
     await record_in_bigquery(result)
@@ -325,8 +366,9 @@ async def generate_report(assessment_id, refresh=False):
     except asyncio.TimeoutError as exc:
         raise AnalysisError("Writing the report took too long. Please try again.", 504) from exc
     except Exception as exc:
-        log.warning("Report generation failed for %s: %s", assessment_id, exc)
-        raise AnalysisError("We couldn't write the report right now. Please try again in a few minutes.") from exc
+        # Gemini unavailable: the farmer still gets a plain template-written report.
+        log.warning("Gemini report failed for %s, using the template: %s", assessment_id, exc)
+        report_text = report_template.build(assessment)
 
     assessment["report"] = report_text
     try:

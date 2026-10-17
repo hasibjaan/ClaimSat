@@ -6,7 +6,11 @@ import ConfidenceBadge from "@/components/ConfidenceBadge";
 import NdviChart from "@/components/NdviChart";
 import PhotoUpload from "@/components/PhotoUpload";
 import ScoreGauge from "@/components/ScoreGauge";
-import { EVENT_LABELS, formatArea, formatDate, formatDateList, pct } from "@/lib/format";
+import VerificationCard from "@/components/VerificationCard";
+import { EVENT_LABELS, formatArea, formatDate, LEVEL_LABELS, pct } from "@/lib/format";
+import { VERIFY_LABELS } from "@/lib/reportLabels";
+
+const t = VERIFY_LABELS.en;
 
 function Metric({ label, value, hint }) {
   return (
@@ -28,9 +32,8 @@ function Section({ title, children }) {
 }
 
 export default function ResultsPanel({ result, onReset }) {
-  const { metrics, event, images = {}, acquisitions = {}, plot } = result;
+  const { metrics, event, images = {}, plot, severity, area, score } = result;
   const isFlood = event.type === "flood";
-  const isDrought = event.type === "drought";
 
   return (
     <div className="space-y-6">
@@ -48,51 +51,68 @@ export default function ResultsPanel({ result, onReset }) {
         )}
       </div>
 
-      <ScoreGauge score={result.score.damage_score} level={result.score.damage_level} />
-      <ConfidenceBadge confidence={result.confidence} />
+      {/* Case severity: this plot's damage + nearby reports */}
+      <section className="space-y-2">
+        <h3 className="text-center text-sm font-semibold text-ink">{t.severity}</h3>
+        <ScoreGauge
+          score={severity?.score ?? score.damage_score}
+          level={severity?.level ?? score.damage_level}
+          label={t.severityLevel[severity?.level ?? score.damage_level]}
+        />
+        <p className="text-center text-xs text-ink-muted">{t.severityHint}</p>
+        {severity?.reasons?.length > 0 && (
+          <ul className="list-disc space-y-0.5 rounded-lg bg-surface-muted px-8 py-2 text-xs text-ink-muted">
+            {severity.reasons.map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <VerificationCard verification={result.verification} damageLevel={score.damage_level} />
 
       <div className="grid grid-cols-2 gap-2">
-        <Metric label="Crop health lost" value={pct(metrics.ndvi_loss)} hint="vs. the last 3 years" />
-        {isFlood && <Metric label="Field flooded" value={pct(metrics.flood_fraction)} hint="from radar" />}
-        {isDrought && (
-          <Metric
-            label="Rain shortfall"
-            value={pct(metrics.rain_deficit)}
-            hint={metrics.season_rain_mm != null ? `${Math.round(metrics.season_rain_mm)} mm vs ${Math.round(metrics.baseline_rain_mm)} mm normal` : "vs. 20-year normal"}
-          />
+        <Metric label={t.plotDamage} value={score.damage_score ?? "—"} hint={LEVEL_LABELS[score.damage_level]} />
+        {area && (
+          <Metric label={t.nearby} value={area.nearby_farmers} hint={t.areaLevel[area.level] ?? area.level} />
         )}
-        <Metric label="Cropland" value={pct(metrics.crop_fraction)} hint="share of the plot" />
-        {!isFlood && !isDrought && <Metric label="Clear images" value={`${metrics.clear_obs_before} / ${metrics.clear_obs_after}`} hint="before / after" />}
+        <Metric label="Crop health lost" value={pct(metrics.ndvi_loss)} hint="vs. 1 week before" />
+        {isFlood && <Metric label="Newly under water" value={pct(metrics.flood_fraction)} hint="dry 1 week before" />}
       </div>
+      {area && <p className="-mt-3 text-xs text-ink-muted">{t.nearbyText(area.nearby_farmers, area.radius_km, area.window_days)}</p>}
 
-      {images.true_colour_before && images.true_colour_after ? (
-        <Section title="Before and after">
+      <ConfidenceBadge confidence={result.confidence} />
+
+      {images.true_colour_before && images.true_colour_now ? (
+        <Section title="1 week before vs now">
           <BeforeAfterSlider
             before={images.true_colour_before}
-            after={images.true_colour_after}
-            beforeLabel="Before"
-            afterLabel="After"
+            after={images.true_colour_now}
+            beforeLabel={`Before · ${formatDate(metrics.before_image_date)}`}
+            afterLabel={`Now · ${formatDate(metrics.now_image_date)}`}
           />
-          <p className="text-xs text-ink-muted">Your plot is outlined in yellow. Grey areas were hidden by cloud.</p>
+          <p className="text-xs text-ink-muted">
+            Both images are from Sentinel-2. Your plot is outlined in yellow; grey areas were hidden by cloud.
+          </p>
         </Section>
       ) : (
         <p className="rounded-lg bg-surface-muted p-3 text-sm text-ink-muted">Satellite images couldn&apos;t be generated for this plot.</p>
       )}
 
-      {(images.ndvi_after || images.flood_mask) && (
+      {(images.ndvi_now || images.flood_mask) && (
         <div className="grid grid-cols-2 gap-2">
-          {images.ndvi_after && (
+          {images.ndvi_now && (
             <figure>
               {/* eslint-disable-next-line @next/next/no-img-element -- satellite PNG from our API */}
-              <img src={images.ndvi_after} alt="Crop health after the event" className="aspect-square w-full rounded-lg object-cover" />
-              <figcaption className="mt-1 text-xs text-ink-muted">Crop health after (green = healthy)</figcaption>
+              <img src={images.ndvi_now} alt="Crop health now" className="aspect-square w-full rounded-lg object-cover" />
+              <figcaption className="mt-1 text-xs text-ink-muted">Crop health now (green = healthy)</figcaption>
             </figure>
           )}
           {images.flood_mask && (
             <figure>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={images.flood_mask} alt="Flooded area detected by radar" className="aspect-square w-full rounded-lg object-cover" />
-              <figcaption className="mt-1 text-xs text-ink-muted">Flooded area (blue), from radar</figcaption>
+              <img src={images.flood_mask} alt="Land that became water since the week before" className="aspect-square w-full rounded-lg object-cover" />
+              <figcaption className="mt-1 text-xs text-ink-muted">New water since the week before (blue)</figcaption>
             </figure>
           )}
         </div>
@@ -100,19 +120,6 @@ export default function ResultsPanel({ result, onReset }) {
 
       <Section title="Crop health over time">
         <NdviChart series={result.ndvi_series} />
-      </Section>
-
-      <Section title="Satellite images used">
-        <dl className="space-y-1 text-xs text-ink-muted">
-          <div><dt className="inline font-medium text-ink">Sentinel-2 before: </dt><dd className="inline">{formatDateList(acquisitions.s2_before)}</dd></div>
-          <div><dt className="inline font-medium text-ink">Sentinel-2 after: </dt><dd className="inline">{formatDateList(acquisitions.s2_after)}</dd></div>
-          {isFlood && (
-            <>
-              <div><dt className="inline font-medium text-ink">Radar before: </dt><dd className="inline">{formatDateList(acquisitions.s1_pre)}</dd></div>
-              <div><dt className="inline font-medium text-ink">Radar after: </dt><dd className="inline">{formatDateList(acquisitions.s1_post)}</dd></div>
-            </>
-          )}
-        </dl>
       </Section>
 
       <PhotoUpload key={result.assessment_id} assessmentId={result.assessment_id} initialCheck={result.photo_check} />

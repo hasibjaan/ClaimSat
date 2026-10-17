@@ -14,7 +14,7 @@ import json
 import re
 import time
 
-from app import assessments, ee_analysis, plots, report
+from app import area, assessments, ee_analysis, plots, report, weather_check
 
 
 def main():
@@ -36,12 +36,11 @@ def main():
                 "plot_id": plot["plot_id"],
                 "event_type": demo["event_type"],
                 "event_date": demo["event_date"],
-                "season_window": demo.get("season_window"),
             }
         )
         # Fixed ids, so re-running replaces the same files (ids allow [a-z0-9] only).
         assessment_id = "asm_demo" + re.sub(r"[^a-z0-9]", "", demo["id"].lower())
-        call = (request["geometry"], request["event_type"], request["event_date"], request["season_window"])
+        call = (request["geometry"], request["event_type"], request["event_date"])
 
         analysis = ee_analysis.assess(*call)
         thumbs = ee_analysis.thumbnails(*call)
@@ -50,7 +49,10 @@ def main():
         for name, png in thumbs.items():
             (asset_dir / f"{name}.png").write_bytes(png)
 
-        result = assessments.build_result(assessment_id, request, request["area_ha"], analysis, thumbs, "live")
+        weather = weather_check.check(request["event_type"], demo["event_date"], ee_analysis.weather_facts(*call))
+        centroid = analysis["plot_stats"]["centroid"]
+        nearby = area.nearby(centroid["lat"], centroid["lng"], request["farmer_id"], request["event_type"], demo["event_date"])
+        result = assessments.build_result(assessment_id, request, request["area_ha"], analysis, thumbs, "live", weather, nearby)
         if not args.skip_report:
             try:
                 result["report"] = report.generate(result)
@@ -60,7 +62,8 @@ def main():
         (assessments.DEMO_CACHE / "results" / f"{demo['id']}.json").write_text(json.dumps(result, ensure_ascii=False))
         score = result["score"]
         print(
-            f"{demo['id']:>9}: score {score['damage_score']} ({score['damage_level']}), "
+            f"{demo['id']:>9}: damage {score['damage_score']} ({score['damage_level']}), "
+            f"severity {result['severity']['level']}, {result['verification']['status']}, "
             f"confidence {result['confidence']['level']}, {len(thumbs)} images, "
             f"report {'yes' if result.get('report') else 'no'}, {time.perf_counter() - started:.0f}s"
         )

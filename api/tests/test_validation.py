@@ -7,17 +7,10 @@ from app.validation import ValidationError, ring_area_m2, validate_event, valida
 TODAY = date(2026, 10, 17)
 
 
-def square(lng=75.06, lat=16.73, half_deg=0.0005):
-    return {
-        "type": "Polygon",
-        "coordinates": [[
-            [lng - half_deg, lat - half_deg],
-            [lng + half_deg, lat - half_deg],
-            [lng + half_deg, lat + half_deg],
-            [lng - half_deg, lat + half_deg],
-            [lng - half_deg, lat - half_deg],
-        ]],
-    }
+# Default: the outline of sample plot plt_seed_1 (app/seed_plots.json).
+def square(lng=75.0584, lat=16.7323, half_deg=0.0005):
+    w, e, s, n = (round(v, 6) for v in (lng - half_deg, lng + half_deg, lat - half_deg, lat + half_deg))
+    return {"type": "Polygon", "coordinates": [[[w, s], [e, s], [e, n], [w, n], [w, s]]]}
 
 
 def test_area_of_a_roughly_one_hectare_square():
@@ -66,8 +59,8 @@ def test_event_dates():
     assert validate_event("flood", "2019-08-07", today=TODAY)[1] == date(2019, 8, 7)
     with pytest.raises(ValidationError, match="starts in 2016"):
         validate_event("flood", "2015-12-31", today=TODAY)
-    with pytest.raises(ValidationError, match="at least 7 days ago"):
-        validate_event("flood", "2026-10-12", today=TODAY)
+    with pytest.raises(ValidationError, match="before today"):
+        validate_event("flood", "2026-10-17", today=TODAY)
     with pytest.raises(ValidationError, match="YYYY-MM-DD"):
         validate_event("flood", "07/08/2019", today=TODAY)
     with pytest.raises(ValidationError, match="event type"):

@@ -1,5 +1,5 @@
 {
-  "_note": "Sample registered plots so the app works before an officer registers any. Coordinates are illustrative (near Athani, Belagavi district). Survey numbers are made up.",
+  "_note": "Sample registered plots for demo farmer KA-DEMO-001, each showing a different outcome: 112/3 a verified, widespread flood; 118/1 the same kind of damage but no nearby reports (severity held at moderate); 124/2 a 'flood' claimed in the dry season (weather check: not supported). Coordinates near Athani are illustrative; survey numbers are made up.",
   "plots": [
     {
       "plot_id": "plt_seed_1",
@@ -10,9 +10,35 @@
       "crop": "sugarcane",
       "geometry": {
         "type": "Polygon",
-        "coordinates": [[[75.0595, 16.7295], [75.0605, 16.7295], [75.0605, 16.7305], [75.0595, 16.7305], [75.0595, 16.7295]]]
+        "coordinates": [
+          [
+            [
+              75.0579,
+              16.7318
+            ],
+            [
+              75.0589,
+              16.7318
+            ],
+            [
+              75.0589,
+              16.7328
+            ],
+            [
+              75.0579,
+              16.7328
+            ],
+            [
+              75.0579,
+              16.7318
+            ]
+          ]
+        ]
       },
-      "default_event": { "event_type": "flood", "event_date": "2019-08-07" },
+      "default_event": {
+        "event_type": "flood",
+        "event_date": "2019-08-07"
+      },
       "source": "seed",
       "registered_by": "seed",
       "registered_at": "2026-10-17T00:00:00Z"
@@ -23,12 +49,80 @@
       "farmer_name": "Ramesh",
       "village": "Athani taluk",
       "survey_number": "118/1",
+      "crop": "sugarcane",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              75.07725,
+              16.7574
+            ],
+            [
+              75.07835,
+              16.7574
+            ],
+            [
+              75.07835,
+              16.7584
+            ],
+            [
+              75.07725,
+              16.7584
+            ],
+            [
+              75.07725,
+              16.7574
+            ]
+          ]
+        ]
+      },
+      "default_event": {
+        "event_type": "flood",
+        "event_date": "2019-08-07"
+      },
+      "source": "seed",
+      "registered_by": "seed",
+      "registered_at": "2026-10-17T00:00:00Z"
+    },
+    {
+      "plot_id": "plt_seed_3",
+      "farmer_id": "KA-DEMO-001",
+      "farmer_name": "Ramesh",
+      "village": "Athani taluk",
+      "survey_number": "124/2",
       "crop": "maize",
       "geometry": {
         "type": "Polygon",
-        "coordinates": [[[75.0625, 16.7315], [75.0637, 16.7315], [75.0637, 16.7324], [75.0625, 16.7324], [75.0625, 16.7315]]]
+        "coordinates": [
+          [
+            [
+              75.08255,
+              16.7119
+            ],
+            [
+              75.08365,
+              16.7119
+            ],
+            [
+              75.08365,
+              16.7129
+            ],
+            [
+              75.08255,
+              16.7129
+            ],
+            [
+              75.08255,
+              16.7119
+            ]
+          ]
+        ]
       },
-      "default_event": { "event_type": "flood", "event_date": "2019-08-07" },
+      "default_event": {
+        "event_type": "flood",
+        "event_date": "2019-03-12"
+      },
       "source": "seed",
       "registered_by": "seed",
       "registered_at": "2026-10-17T00:00:00Z"

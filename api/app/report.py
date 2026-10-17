@@ -74,9 +74,12 @@ Rules:
 - When you mention a percentage, use exactly a value from "percentages" in the
   facts, written with Western digits and a % sign (for example 65%). Do not
   calculate new numbers. Kannada text also uses Western digits.
-- State the damage level and confidence level exactly as given. Do not make the
-  damage sound worse or milder than the facts.
+- State the damage level, confidence level, case severity and verification
+  status exactly as given. Do not make the damage sound worse or milder.
 - Explain the confidence level using the confidence reasons provided.
+- Explain the two-step verification: step 1, the satellite images (one from
+  about a week before the event, one recent); step 2, the weather record.
+- Mention how many other farmers nearby reported the same event, as given.
 - Plain, respectful language a farmer can understand. Short sentences. Explain
   terms like NDVI as "crop health measured from satellite images".
 - Say clearly that this is supporting evidence for the claim, not an official
@@ -85,8 +88,9 @@ Rules:
   agriculture office within 72 hours of the event as PMFBY requires (or as soon
   as possible if that time has passed), attach this report, and ask for a field
   inspection.
-- Limitations: mention clouds, the 10-metre pixel size, and that the crop type
-  is as reported by the user, plus anything the confidence reasons point to.
+- Limitations: mention clouds, the 10-metre pixel size, that only two images
+  are compared (so slow changes such as drought show less), and that the crop
+  type is as reported by the user, plus anything the confidence reasons point to.
 - Kannada must be natural, simple Kannada as spoken in Karnataka, not a word-by-
   word translation.
 """
@@ -105,10 +109,11 @@ def build_facts(assessment):
     event = assessment["event"]
     percentages = {
         "crop_health_lost": _pct(metrics.get("ndvi_loss")),
-        "field_flooded": _pct(metrics.get("flood_fraction")),
-        "rain_shortfall": _pct(metrics.get("rain_deficit")),
-        "plot_is_cropland": _pct(metrics.get("crop_fraction")),
+        "field_newly_under_water": _pct(metrics.get("flood_fraction")),
+        "field_under_water_now": _pct(metrics.get("water_now")),
     }
+    verification = assessment.get("verification") or {}
+    weather = verification.get("weather") or {}
     return {
         "plot": {
             "farmer_name": plot.get("farmer_name") or None,
@@ -124,29 +129,29 @@ def build_facts(assessment):
             "level": assessment["score"]["damage_level"],
         },
         "confidence": assessment["confidence"],
+        "case_severity": assessment.get("severity"),
+        "nearby_reports": assessment.get("area"),
+        "verification": {
+            "status": verification.get("status"),
+            "step_1_satellite": verification.get("satellite"),
+            "step_2_weather_verdict": weather.get("verdict"),
+            "step_2_weather_explanation": weather.get("explanation_en"),
+            "weather_facts": {k: v for k, v in (weather.get("facts") or {}).items() if k != "windows"},
+        },
         "percentages": {k: v for k, v in percentages.items() if v is not None},
         "measurements": {
-            "crop_health_before_event": metrics.get("ndvi_before"),
-            "crop_health_after_event": metrics.get("ndvi_after"),
-            "normal_crop_health_for_these_weeks": metrics.get("ndvi_baseline_after"),
-            "season_rain_mm": metrics.get("season_rain_mm"),
-            "normal_season_rain_mm": metrics.get("baseline_rain_mm"),
-            "cloud_free_images_before": metrics.get("clear_obs_before"),
-            "cloud_free_images_after": metrics.get("clear_obs_after"),
-            "radar_images_before": metrics.get("radar_obs_pre"),
-            "radar_images_after": metrics.get("radar_obs_post"),
+            "crop_health_1_week_before": metrics.get("ndvi_before"),
+            "crop_health_now": metrics.get("ndvi_now"),
+            "image_1_week_before_date": metrics.get("before_image_date"),
+            "image_now_date": metrics.get("now_image_date"),
         },
-        "image_dates": assessment.get("acquisitions"),
         "data_sources": [
-            "Sentinel-2 optical satellite images (European Space Agency, Copernicus)",
-            "Sentinel-1 radar satellite images (Copernicus), which see through clouds",
-            "CHIRPS rainfall data",
-            "Dynamic World land cover (Google)",
-            "JRC Global Surface Water, to exclude permanent rivers and lakes",
+            "Sentinel-2 satellite images (European Space Agency, Copernicus): one image about a week before the event and the most recent one",
+            "ERA5-Land daily weather (ECMWF / Copernicus), used only to verify the claim",
         ],
         "how_damage_is_measured": (
-            "Crop health after the event is compared with the same weeks in the "
-            "previous 3 years, so a normal harvest is not counted as damage."
+            "From the same two Sentinel-2 images: crop health (NDVI) and standing water (water index) "
+            "about a week before the event are compared with the latest image."
         ),
     }
 

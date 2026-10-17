@@ -14,7 +14,7 @@ const FarmerPlotMap = dynamic(() => import("@/components/FarmerPlotMap"), {
   loading: () => <div className="absolute inset-0 animate-pulse bg-ink/10" />,
 });
 
-const EMPTY_VALUES = { event_type: "flood", event_date: "", crop: "", season: { start: "", end: "" } };
+const EMPTY_VALUES = { event_type: "flood", event_date: "", crop: "" };
 const inputClass =
   "block min-h-12 w-full rounded-lg border border-line bg-surface px-3 text-lg tracking-wide text-ink uppercase focus:border-brand focus:ring-2 focus:ring-brand/30 focus:outline-none";
 
@@ -58,7 +58,6 @@ export default function FarmerApp() {
         ? {
             event_type: plot.default_event.event_type,
             event_date: plot.default_event.event_date,
-            season: plot.default_event.season_window ?? EMPTY_VALUES.season,
           }
         : {}),
       crop: plot.crop ?? "",
@@ -81,14 +80,12 @@ export default function FarmerApp() {
     setStatus("loading");
     setError(null);
     setSheetOpen(true);
-    const season = values.event_type === "drought" && values.season.start && values.season.end ? values.season : null;
     try {
       const data = await assess({
         plot_id: selectedId,
         event_type: values.event_type,
         event_date: values.event_date,
         crop: values.crop,
-        season_window: season,
       });
       setResult(data);
       setStatus("done");

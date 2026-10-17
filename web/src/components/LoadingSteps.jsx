@@ -2,30 +2,22 @@
 
 import { useEffect, useState } from "react";
 
+const COMMON_START = [
+  "Finding a clear Sentinel-2 image from 1 week before",
+  "Finding the latest clear image of your field",
+];
+const COMMON_END = [
+  "Step 2: checking the weather record with AI",
+  "Counting reports from farmers nearby",
+  "Working out the case severity",
+];
 const STEPS = {
-  flood: [
-    "Finding Sentinel-2 images of your field",
-    "Fetching radar images (they see through clouds)",
-    "Mapping water on your field after the flood",
-    "Comparing with the same weeks in the last 3 years",
-    "Scoring the damage",
-  ],
-  drought: [
-    "Finding Sentinel-2 images of your field",
-    "Measuring crop health through the season",
-    "Adding up rainfall against the 20-year normal",
-    "Comparing with the same season in the last 3 years",
-    "Scoring the damage",
-  ],
-  other: [
-    "Finding Sentinel-2 images of your field",
-    "Measuring crop health before and after",
-    "Comparing with the same weeks in the last 3 years",
-    "Scoring the damage",
-  ],
+  flood: [...COMMON_START, "Comparing crop health and standing water", ...COMMON_END],
+  drought: [...COMMON_START, "Comparing crop health", ...COMMON_END],
+  other: [...COMMON_START, "Comparing crop health", ...COMMON_END],
 };
 
-const STEP_MS = 5000;
+const STEP_MS = 4000;
 
 export default function LoadingSteps({ eventType }) {
   const steps = STEPS[eventType] ?? STEPS.other;

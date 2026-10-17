@@ -1,5 +1,5 @@
 {
-  "_note": "Contract for the assessment result returned by POST /api/assess and GET /api/assessments/{id}. All values here are illustrative placeholders, not real measurements. Keep this file in sync with the backend output. score.damage_level is one of none|low|moderate|severe|unknown (unknown = no usable data). Any metric can be null when the satellite data for it is missing; radar_obs_* are null for non-flood events, rain fields are null for non-drought events. plot.plot_id is a registered plot (farmers can't draw plots; officers register them).",
+  "_note": "Contract for the assessment result (POST /api/assess, GET /api/assessments/{id}). Illustrative values, not real measurements. One satellite (Sentinel-2): 'before' = clear image closest to 1 week before the event, 'now' = latest clear image. score = this plot's damage; severity = damage combined with nearby reports (one report alone is capped at moderate); verification = step 1 satellite + step 2 weather (Gemini, ERA5-Land): verified | needs_review | not_supported. Any metric can be null when the image is missing. plot.plot_id is a registered plot.",
   "assessment_id": "asm_sample_flood1",
   "source": "sample",
   "created_at": "2026-10-17T10:30:00Z",
@@ -10,35 +10,35 @@
     "farmer_name": "Ramesh",
     "village": "Athani taluk",
     "crop": "sugarcane",
-    "area_ha": 1.02,
-    "area_pixels": 102,
+    "area_ha": 1.19,
+    "area_pixels": 119,
     "centroid": {
-      "lat": 16.73,
-      "lng": 75.06
+      "lat": 16.7323,
+      "lng": 75.0584
     },
     "geometry": {
       "type": "Polygon",
       "coordinates": [
         [
           [
-            75.0595,
-            16.7295
+            75.0579,
+            16.7318
           ],
           [
-            75.0605,
-            16.7295
+            75.0589,
+            16.7318
           ],
           [
-            75.0605,
-            16.7305
+            75.0589,
+            16.7328
           ],
           [
-            75.0595,
-            16.7305
+            75.0579,
+            16.7328
           ],
           [
-            75.0595,
-            16.7295
+            75.0579,
+            16.7318
           ]
         ]
       ]
@@ -49,46 +49,32 @@
     "date": "2019-08-07",
     "windows": {
       "before": {
-        "start": "2019-07-08",
-        "end": "2019-08-06"
+        "start": "2019-07-26",
+        "end": "2019-08-04"
       },
-      "after": {
-        "start": "2019-08-12",
-        "end": "2019-09-06"
-      },
-      "radar_pre": {
-        "start": "2019-07-08",
-        "end": "2019-08-06"
-      },
-      "radar_post": {
+      "before_target": "2019-07-31",
+      "now": {
         "start": "2019-08-07",
-        "end": "2019-08-17"
+        "end": "2019-08-21"
       },
       "series": {
-        "start": "2019-05-09",
-        "end": "2019-10-06"
-      },
-      "baseline_years": [
-        2016,
-        2017,
-        2018
-      ]
+        "start": "2019-07-08",
+        "end": "2019-08-21"
+      }
     }
   },
   "metrics": {
-    "ndvi_before": 0.71,
-    "ndvi_after": 0.24,
-    "ndvi_baseline_after": 0.68,
-    "ndvi_loss": 0.65,
+    "ndvi_before": 0.72,
+    "ndvi_now": 0.25,
+    "ndvi_loss": 0.653,
+    "water_before": 0.02,
+    "water_now": 0.86,
     "flood_fraction": 0.83,
-    "rain_deficit": null,
-    "season_rain_mm": null,
-    "baseline_rain_mm": null,
-    "crop_fraction": 0.78,
-    "clear_obs_before": 3,
-    "clear_obs_after": 4,
-    "radar_obs_pre": 2,
-    "radar_obs_post": 1
+    "before_image_date": "2019-07-31",
+    "now_image_date": "2019-08-15",
+    "before_clear": 0.94,
+    "now_clear": 0.88,
+    "days_between": 15
   },
   "score": {
     "damage_score": 74,
@@ -97,106 +83,113 @@
   "confidence": {
     "level": "high",
     "reasons": [
-      "3 or more cloud-free Sentinel-2 images before and after the event",
-      "Radar images available before and after the event",
-      "Plot is mostly cropland (78%)",
-      "Plot covers 102 satellite pixels"
+      "Clear Sentinel-2 image 1 week before: 2019-07-31",
+      "Clear Sentinel-2 image now: 2019-08-15",
+      "Plot covers 119 satellite pixels (10 m each)"
+    ]
+  },
+  "verification": {
+    "status": "verified",
+    "satellite": {
+      "passed": true,
+      "reason": "The satellite images show severe damage on this plot."
+    },
+    "weather": {
+      "verdict": "supported",
+      "rule_verdict": "supported",
+      "rule_reason": "Heavy rain: 286.4 mm across the region in the week before (normal 74.8 mm).",
+      "explanation_en": "The region had 286.4 mm of rain in the week before the flood, far above the normal 74.8 mm, with up to 71.3 mm in a single day. Weather like this can cause the flooding reported.",
+      "explanation_kn": "ಪ್ರವಾಹಕ್ಕೂ ಹಿಂದಿನ ವಾರ ಈ ಪ್ರದೇಶದಲ್ಲಿ 286.4 ಮಿ.ಮೀ ಮಳೆಯಾಗಿದೆ, ಇದು ಸಾಮಾನ್ಯ 74.8 ಮಿ.ಮೀಗಿಂತ ತುಂಬಾ ಹೆಚ್ಚು. ಒಂದೇ ದಿನದಲ್ಲಿ 71.3 ಮಿ.ಮೀ ವರೆಗೆ ಮಳೆಯಾಗಿದ್ದು, ಇಂತಹ ಪ್ರವಾಹಕ್ಕೆ ಕಾರಣವಾಗಬಹುದು.",
+      "model": "sample",
+      "facts": {
+        "rain_event_local_mm": 142.6,
+        "max_daily_rain_local_mm": 71.3,
+        "rain_week_region_mm": 286.4,
+        "normal_week_region_mm": 74.8,
+        "rain_month_local_mm": 512.0,
+        "normal_month_local_mm": 268.5,
+        "max_temp_c": 29.4,
+        "days_with_data": 10,
+        "region_km": 50,
+        "windows": {
+          "event_local": {
+            "start": "2019-08-04",
+            "end": "2019-08-08"
+          },
+          "week_region": {
+            "start": "2019-07-31",
+            "end": "2019-08-07"
+          },
+          "month_local": {
+            "start": "2019-07-08",
+            "end": "2019-08-07"
+          }
+        },
+        "source": "ERA5-Land daily weather (ECMWF / Copernicus)"
+      }
+    }
+  },
+  "area": {
+    "radius_km": 2,
+    "window_days": 7,
+    "nearby_reports": 6,
+    "nearby_farmers": 6,
+    "nearby_avg_damage": 67,
+    "level": "widespread"
+  },
+  "severity": {
+    "score": 82,
+    "level": "severe",
+    "reasons": [
+      "Plot damage score 74/100",
+      "6 other farmers within 2 km reported the same event"
     ]
   },
   "images": {
     "true_colour_before": "/api/assets/asm_sample_flood1/true_colour_before.png",
-    "true_colour_after": "/api/assets/asm_sample_flood1/true_colour_after.png",
-    "ndvi_after": "/api/assets/asm_sample_flood1/ndvi_after.png",
+    "true_colour_now": "/api/assets/asm_sample_flood1/true_colour_now.png",
+    "ndvi_now": "/api/assets/asm_sample_flood1/ndvi_now.png",
     "flood_mask": "/api/assets/asm_sample_flood1/flood_mask.png"
   },
   "acquisitions": {
-    "s2_before": [
-      "2019-07-14",
-      "2019-07-24",
-      "2019-08-03"
-    ],
-    "s2_after": [
-      "2019-08-18",
-      "2019-08-23",
-      "2019-08-28",
-      "2019-09-02"
-    ],
-    "s1_pre": [
-      "2019-07-22",
-      "2019-08-03"
-    ],
-    "s1_post": [
-      "2019-08-09"
-    ]
+    "before": "2019-07-31",
+    "now": "2019-08-15",
+    "satellite": "Sentinel-2"
   },
   "ndvi_series": {
     "this_year": [
       {
-        "day_offset": -84,
-        "date": "2019-05-15",
-        "ndvi": 0.52
+        "day_offset": -27,
+        "date": "2019-07-11",
+        "ndvi": 0.63
       },
       {
-        "day_offset": -54,
-        "date": "2019-06-14",
-        "ndvi": 0.61
-      },
-      {
-        "day_offset": -24,
-        "date": "2019-07-14",
-        "ndvi": 0.7
-      },
-      {
-        "day_offset": -4,
-        "date": "2019-08-03",
-        "ndvi": 0.72
-      },
-      {
-        "day_offset": 11,
-        "date": "2019-08-18",
-        "ndvi": 0.21
-      },
-      {
-        "day_offset": 26,
-        "date": "2019-09-02",
-        "ndvi": 0.27
-      },
-      {
-        "day_offset": 56,
-        "date": "2019-10-02",
-        "ndvi": 0.38
-      }
-    ],
-    "baseline": [
-      {
-        "day_offset": -84,
-        "ndvi": 0.5
-      },
-      {
-        "day_offset": -54,
-        "ndvi": 0.58
-      },
-      {
-        "day_offset": -24,
-        "ndvi": 0.65
-      },
-      {
-        "day_offset": -4,
-        "ndvi": 0.68
-      },
-      {
-        "day_offset": 11,
+        "day_offset": -17,
+        "date": "2019-07-21",
         "ndvi": 0.69
       },
       {
-        "day_offset": 26,
-        "ndvi": 0.68
+        "day_offset": -7,
+        "date": "2019-07-31",
+        "ndvi": 0.72
       },
       {
-        "day_offset": 56,
-        "ndvi": 0.66
+        "day_offset": 3,
+        "date": "2019-08-10",
+        "ndvi": 0.31
+      },
+      {
+        "day_offset": 8,
+        "date": "2019-08-15",
+        "ndvi": 0.25
+      },
+      {
+        "day_offset": 13,
+        "date": "2019-08-20",
+        "ndvi": 0.27
       }
-    ]
+    ],
+    "baseline": []
   },
   "evidence_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
   "report": null,

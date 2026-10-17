@@ -5,10 +5,11 @@ import { useCallback, useEffect, useState } from "react";
 import LanguageToggle from "@/components/LanguageToggle";
 import NdviChart from "@/components/NdviChart";
 import PhotoCheckResult from "@/components/PhotoCheckResult";
+import VerificationCard from "@/components/VerificationCard";
 import ScoreGauge from "@/components/ScoreGauge";
 import { generateReport, getAssessment, isMock } from "@/lib/api";
-import { formatArea, formatDate, formatDateList, pct } from "@/lib/format";
-import { CONFIDENCE_NAMES, DATA_SOURCES, EVENT_NAMES, LABELS, LEVEL_NAMES, PHOTO_LABELS } from "@/lib/reportLabels";
+import { formatArea, formatDate, pct } from "@/lib/format";
+import { CONFIDENCE_NAMES, DATA_SOURCES, EVENT_NAMES, LABELS, LEVEL_NAMES, PHOTO_LABELS, VERIFY_LABELS } from "@/lib/reportLabels";
 
 const LOCALES = { en: "en-IN", kn: "kn-IN" };
 const CONFIDENCE_STYLES = {
@@ -139,11 +140,11 @@ export default function ReportView({ id }) {
     );
   }
 
-  const { plot, event, metrics, score, confidence, images = {}, acquisitions = {}, report } = assessment;
+  const { plot, event, metrics, score, confidence, images = {}, report, severity, area } = assessment;
+  const v = VERIFY_LABELS[lang];
   const text = (field) => report[`${field}_${lang}`];
   const reasons = lang === "kn" && report.confidence_reasons_kn?.length ? report.confidence_reasons_kn : confidence.reasons;
   const isFlood = event.type === "flood";
-  const isDrought = event.type === "drought";
 
   return (
     <main className={`mx-auto w-full max-w-[210mm] px-4 py-6 print:max-w-none print:p-0 ${lang === "kn" ? "font-kannada" : ""}`} lang={lang}>
@@ -197,7 +198,13 @@ export default function ReportView({ id }) {
             <p className="leading-relaxed text-ink">{text("summary")}</p>
           </div>
           <div className="flex flex-col items-center gap-2">
-            <ScoreGauge score={score.damage_score} level={score.damage_level} label={LEVEL_NAMES[lang][score.damage_level]} outOfLabel={t.outOf} />
+            <p className="text-sm font-semibold text-ink">{v.severity}</p>
+            <ScoreGauge
+              score={severity?.score ?? score.damage_score}
+              level={severity?.level ?? score.damage_level}
+              label={v.severityLevel[severity?.level ?? score.damage_level]}
+              outOfLabel={t.outOf}
+            />
             <span className={`rounded-full px-3 py-1 text-sm font-semibold ${CONFIDENCE_STYLES[confidence.level] ?? CONFIDENCE_STYLES.low}`}>
               {CONFIDENCE_NAMES[lang][confidence.level]}
             </span>
@@ -210,10 +217,13 @@ export default function ReportView({ id }) {
           ))}
         </ul>
 
+        <VerificationCard verification={assessment.verification} damageLevel={score.damage_level} lang={lang} />
+
         <Section title={t.plotDetails}>
           <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
             {[
               [t.farmer, plot.farmer_name || "—"],
+              [t.survey, plot.survey_number || "—"],
               [t.village, plot.village || "—"],
               [t.crop, plot.crop || "—"],
               [t.area, formatArea(plot.area_ha)],
@@ -230,13 +240,14 @@ export default function ReportView({ id }) {
 
         <Section title={t.keyMeasurements}>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <Metric label={v.plotDamage} value={score.damage_score ?? "—"} hint={LEVEL_NAMES[lang][score.damage_level]} />
+            <Metric label={v.nearby} value={area?.nearby_farmers ?? "—"} hint={v.areaLevel[area?.level] ?? ""} />
             <Metric label={t.cropHealthLost} value={pct(metrics.ndvi_loss)} hint={t.cropHealthLostHint} />
             {isFlood && <Metric label={t.fieldFlooded} value={pct(metrics.flood_fraction)} hint={t.fieldFloodedHint} />}
-            {isDrought && <Metric label={t.rainShortfall} value={pct(metrics.rain_deficit)} hint={t.rainShortfallHint} />}
-            <Metric label={t.cropland} value={pct(metrics.crop_fraction)} hint={t.croplandHint} />
-            <Metric label={t.damageScore} value={score.damage_score ?? "—"} hint={t.outOf} />
           </div>
         </Section>
+
+        {area && <p className="-mt-3 text-xs text-ink-muted">{v.nearbyText(area.nearby_farmers, area.radius_km, area.window_days)}</p>}
 
         <Section title={t.findings}>
           <ol className="space-y-3">
@@ -252,9 +263,9 @@ export default function ReportView({ id }) {
         {Object.keys(images).length > 0 && (
           <Section title={t.images}>
             <div className="grid grid-cols-2 gap-3 print:grid-cols-4">
-              <Figure src={images.true_colour_before} caption={t.before} />
-              <Figure src={images.true_colour_after} caption={t.after} />
-              <Figure src={images.ndvi_after} caption={t.ndviAfter} />
+              <Figure src={images.true_colour_before} caption={`${t.before} · ${formatDate(metrics.before_image_date, locale)}`} />
+              <Figure src={images.true_colour_now} caption={`${t.after} · ${formatDate(metrics.now_image_date, locale)}`} />
+              <Figure src={images.ndvi_now} caption={t.ndviAfter} />
               <Figure src={images.flood_mask} caption={t.floodMask} />
             </div>
             <p className="mt-2 text-xs text-ink-muted">{t.imagesNote}</p>
@@ -288,13 +299,12 @@ export default function ReportView({ id }) {
           </ul>
           <dl className="mt-3 space-y-0.5 text-xs text-ink-muted">
             {[
-              [t.s2Before, acquisitions.s2_before],
-              [t.s2After, acquisitions.s2_after],
-              ...(isFlood ? [[t.s1Before, acquisitions.s1_pre], [t.s1After, acquisitions.s1_post]] : []),
-            ].map(([label, dates]) => (
+              [t.s2Before, metrics.before_image_date],
+              [t.s2After, metrics.now_image_date],
+            ].map(([label, d]) => (
               <div key={label}>
                 <dt className="inline font-medium text-ink">{label}: </dt>
-                <dd className="inline">{formatDateList(dates, locale, "—")}</dd>
+                <dd className="inline">{formatDate(d, locale)}</dd>
               </div>
             ))}
           </dl>

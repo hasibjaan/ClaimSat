@@ -22,38 +22,36 @@ EE_SCOPES = [
     "https://www.googleapis.com/auth/cloud-platform",
 ]
 
-# --- Earth Engine datasets ---------------------------------------------------
-# Top-of-atmosphere Sentinel-2 (since 2015). Surface reflectance doesn't cover
-# India for the 2016-2018 baseline years, so we use TOA everywhere.
+# --- The one satellite: Sentinel-2 -------------------------------------------
+# Every damage measurement comes from Sentinel-2: one image ~1 week before the
+# event and the most recent image of the plot. From each image we read crop
+# health (NDVI, bands B8/B4) and standing water (MNDWI, bands B3/B11).
+# Cloud Score+ is Sentinel-2's own cloud mask.
 S2_COLLECTION = "COPERNICUS/S2_HARMONIZED"
 CS_PLUS_COLLECTION = "GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED"
 CS_BAND = "cs"
-S1_COLLECTION = "COPERNICUS/S1_GRD"
-GSW_IMAGE = "JRC/GSW1_4/GlobalSurfaceWater"
-CHIRPS_COLLECTION = "UCSB-CHG/CHIRPS/DAILY"
-DYNAMIC_WORLD_COLLECTION = "GOOGLE/DYNAMICWORLD/V1"
+SCALE_M = 10
 
-SCALE_M = 10            # Sentinel-2 / Sentinel-1 / Dynamic World pixel size
-CHIRPS_SCALE_M = 5566   # CHIRPS pixel size (~0.05 degrees)
+# --- Weather, used only to verify a claim (step 2), never to score damage ----
+ERA5_DAILY = "ECMWF/ERA5_LAND/DAILY_AGGR"
+ERA5_SCALE_M = 11132
+WEATHER_REGION_KM = 50       # rain upstream can flood fields: look at the region too
+WEATHER_NORMAL_YEARS = 10    # "normal" = same dates in the previous 10 years
 
 # --- Thresholds ----------------------------------------------------------------
 CS_CLEAR_THRESHOLD = 0.6          # Cloud Score+ value at or above which a pixel is clear
-CLEAR_IMAGE_MIN_FRACTION = 0.5    # an image counts as a "clear observation" above this
-FLOOD_VV_THRESHOLD_DB = -16.0     # post-event VV backscatter below this looks like water
-FLOOD_CHANGE_THRESHOLD_DB = -3.0  # ...and it must have dropped by at least this much
-PERMANENT_WATER_OCCURRENCE = 50   # JRC occurrence (%) above which water is permanent
+CLEAR_IMAGE_MIN_FRACTION = 0.5    # an image is usable if this share of the plot is clear
+WATER_MNDWI_THRESHOLD = 0.0       # MNDWI above this = open water
+MIN_CROP_NDVI = 0.2               # below this before the event, there was little crop to lose
 
 # --- Time windows (days relative to the event date E, inclusive) ---------------
-BEFORE_WINDOW = (-30, -1)
-AFTER_WINDOW = (5, 30)
-RADAR_PRE_WINDOW = (-30, -1)
-RADAR_POST_WINDOW = (0, 10)
-SERIES_WINDOW = (-90, 60)
-SERIES_BIN_DAYS = 10
-CROPLAND_LOOKBACK_DAYS = 365
-DROUGHT_SEASON_DEFAULT = ((6, 1), (9, 30))  # (month, day) start and end
-DROUGHT_BEFORE_DAYS = 30                     # "before" = the 30 days before the season
-BASELINE_YEARS = 3
-RAIN_BASELINE_YEARS = 20
+BEFORE_TARGET_DAY = -7            # the "before" image: the clear one closest to 1 week before
+BEFORE_SEARCH = (-12, -3)
+NOW_SEARCH = (0, 14)              # the "now" image: the latest clear one (up to today)
+SERIES_WINDOW = (-30, 14)
+
+# --- Nearby reports (case severity) ----------------------------------------------
+NEARBY_RADIUS_KM = 2
+NEARBY_WINDOW_DAYS = 7
 
 EVENT_TYPES = ("flood", "drought", "other")

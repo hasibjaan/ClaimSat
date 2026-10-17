@@ -1,0 +1,71 @@
+{
+  "_note": "Sample reports from neighbouring demo farmers (illustrative, not real) so the demo area shows how nearby reports raise case severity.",
+  "reports": [
+    {
+      "assessment_id": "asm_seedreport1",
+      "farmer_id": "KA-DEMO-101",
+      "plot_id": "plt_seedreport1",
+      "lat": 16.7363,
+      "lng": 75.0614,
+      "event_type": "flood",
+      "event_date": "2019-08-07",
+      "damage_score": 82,
+      "created_at": "2019-08-10T10:00:00Z"
+    },
+    {
+      "assessment_id": "asm_seedreport2",
+      "farmer_id": "KA-DEMO-102",
+      "plot_id": "plt_seedreport2",
+      "lat": 16.7263,
+      "lng": 75.0604,
+      "event_type": "flood",
+      "event_date": "2019-08-08",
+      "damage_score": 71,
+      "created_at": "2019-08-11T10:00:00Z"
+    },
+    {
+      "assessment_id": "asm_seedreport3",
+      "farmer_id": "KA-DEMO-103",
+      "plot_id": "plt_seedreport3",
+      "lat": 16.7343,
+      "lng": 75.0514,
+      "event_type": "flood",
+      "event_date": "2019-08-06",
+      "damage_score": 66,
+      "created_at": "2019-08-12T10:00:00Z"
+    },
+    {
+      "assessment_id": "asm_seedreport4",
+      "farmer_id": "KA-DEMO-104",
+      "plot_id": "plt_seedreport4",
+      "lat": 16.7413,
+      "lng": 75.0644,
+      "event_type": "flood",
+      "event_date": "2019-08-09",
+      "damage_score": 58,
+      "created_at": "2019-08-13T10:00:00Z"
+    },
+    {
+      "assessment_id": "asm_seedreport5",
+      "farmer_id": "KA-DEMO-105",
+      "plot_id": "plt_seedreport5",
+      "lat": 16.7293,
+      "lng": 75.0474,
+      "event_type": "flood",
+      "event_date": "2019-08-07",
+      "damage_score": 74,
+      "created_at": "2019-08-14T10:00:00Z"
+    },
+    {
+      "assessment_id": "asm_seedreport6",
+      "farmer_id": "KA-DEMO-106",
+      "plot_id": "plt_seedreport6",
+      "lat": 16.7443,
+      "lng": 75.0544,
+      "event_type": "flood",
+      "event_date": "2019-08-08",
+      "damage_score": 49,
+      "created_at": "2019-08-15T10:00:00Z"
+    }
+  ]
+}

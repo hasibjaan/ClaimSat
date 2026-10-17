@@ -2,7 +2,7 @@
 
 **Satellite evidence for crop insurance claims.**
 
-When floods or drought destroy a crop, a PMFBY insurance claim depends on an assessor visiting the field, often days or weeks later, after the evidence has gone. ClaimSat measures the damage from space. An agriculture officer registers each farmer's plot from the land records. After a flood or drought, the farmer enters their Farmer ID, picks their plot and the date, and gets independent, time-stamped satellite evidence with a report in English and Kannada to attach to the claim. Officers and insurers see damage across a whole village, so they know which fields to visit first.
+When floods or drought destroy a crop, a PMFBY insurance claim depends on an assessor visiting the field, often days or weeks later, after the evidence has gone. ClaimSat measures the damage from space. An agriculture officer registers each farmer's plot from the land records. After a flood or drought, the farmer enters their Farmer ID, picks their plot and the date, and ClaimSat compares a Sentinel-2 image from about a week before the event with the latest one. The claim is verified in two steps (the satellite images, then an AI check against the weather record), its severity takes into account how many farmers nearby reported the same event, and the farmer gets a report in English and Kannada to attach to the claim. Officers and insurers see damage across a whole village, so they know which fields to visit first.
 
 > ClaimSat provides supporting evidence. It is not an official loss assessment.
 
@@ -13,7 +13,7 @@ Built for the Digital Campus on Google Cloud Hack Sprint, Yenepoya University, 1
 | Who | Where | What they do |
 |---|---|---|
 | Agriculture officer | `/officer/register` | Outlines a farmer's plot from the land records (survey number). Overlapping outlines and repeated survey numbers are refused. |
-| Farmer | `/farmer` | Enters their Farmer ID, picks one of their registered plots, says what happened and when, and gets a damage score, evidence images, a bilingual report and an optional photo check. **Farmers can't draw or change a plot**, so nobody can claim for more land than is registered. |
+| Farmer | `/farmer` | Enters their Farmer ID, picks one of their registered plots, says what happened and when, and gets the case severity, the two-step verification result, before/now images, a bilingual report and an optional photo check. **Farmers can't draw or change a plot**, so nobody can claim for more land than is registered. |
 | Officer / insurer | `/officer/dashboard`, Looker Studio | Sees damage on every assessed plot in the village, and a "visit first" list. |
 
 `/` is the landing page with both entry points. `/status` checks the Google Cloud connections.
@@ -22,8 +22,8 @@ Built for the Digital Campus on Google Cloud Hack Sprint, Yenepoya University, 1
 
 | Service | What it does in ClaimSat |
 |---|---|
-| Earth Engine | Sentinel-1 radar flood detection, Sentinel-2 crop health (NDVI), CHIRPS rainfall, Dynamic World cropland, JRC permanent water |
-| Vertex AI (Gemini) | Writes the bilingual evidence report; checks farmer photos against the satellite evidence |
+| Earth Engine | Sentinel-2 images (the one damage signal): 1 week before vs latest. ERA5-Land weather, used only to verify claims |
+| Vertex AI (Gemini) | Step 2 of verification (is the claim plausible given the weather?), the bilingual evidence report, farmer photo checks |
 | Cloud Run | Hosts the Next.js web app and the FastAPI service |
 | Cloud Storage | Evidence images, field photos (location data removed), assessments, plot registry |
 | BigQuery | Every assessment and plot; powers the officer dashboard |
@@ -38,7 +38,7 @@ flowchart LR
   subgraph CR[Cloud Run]
     W[claimsat-web<br/>Next.js] -->|/api/* proxy| A[claimsat-api<br/>FastAPI]
   end
-  A --> EE[Earth Engine<br/>Sentinel-1, Sentinel-2,<br/>CHIRPS, Dynamic World, JRC]
+  A --> EE[Earth Engine<br/>Sentinel-2 images,<br/>ERA5-Land weather]
   A --> G[Vertex AI<br/>Gemini]
   A --> GCS[Cloud Storage<br/>images, photos, registry]
   A --> BQ[BigQuery<br/>plots, assessments]
@@ -53,8 +53,8 @@ The browser only talks to the web app; its `/api/*` route forwards to the API, s
 web/       Next.js (App Router, JavaScript) + Tailwind CSS
 api/       FastAPI (Python): Earth Engine, Gemini, BigQuery, plot registry
   app/     the service (ee_analysis, scoring, report, photo_check, plots, warehouse…)
-  scripts/ find_demo_plots, precompute_demo, batch_village, setup_bigquery
-  tests/   110 tests, no cloud access needed
+  scripts/ find_demo_plots, precompute_demo, batch_village, setup_bigquery, build_samples
+  tests/   125 tests, no cloud access needed
 shared/    sample_result.json, the API contract between web and api
 deploy.sh  deploys both Cloud Run services
 DEMO_SCRIPT.md  the 3-minute demo and judge Q&A
@@ -132,7 +132,15 @@ python -m scripts.precompute_demo    # saves results, images and reports for eve
 python -m scripts.batch_village      # ~120 village plots in one Earth Engine pass → BigQuery + dashboard cache
 ```
 
-With `DEMO_MODE=true` (the deploy script sets it), the API serves those saved results when a live call fails or takes longer than 45 seconds; the UI marks them "Saved demo result". If nothing was precomputed, the two sample plots fall back to a bundled result clearly marked "Sample data", so the demo never dead-ends. Real farmers' plots never get a fallback.
+With `DEMO_MODE=true` (the deploy script sets it), the API serves those saved results when a live call fails or takes longer than 45 seconds; the UI marks them "Saved demo result". If nothing was precomputed, demo farmer **KA-DEMO-001**'s three sample plots fall back to bundled results clearly marked "Sample data", so the demo never dead-ends. Real farmers' plots never get a fallback.
+
+The three sample plots each show a different rule (built by `python -m scripts.build_samples` with the real scoring code; numbers are illustrative):
+
+| Plot | Story | Outcome |
+|---|---|---|
+| 112/3 | Flood after very heavy rain; 6 neighbours reported it | Verified, severity **severe** (82) |
+| 118/1 | Heavy damage, but nobody nearby reported it | Verified, severity held at **moderate** (60): one report alone can't be severe |
+| 124/2 | A "flood" claimed in the dry season; field unchanged | **Not supported**: no damage in the images, no rain in the weather record |
 
 Then deploy (below), open the live URL, and walk through [DEMO_SCRIPT.md](DEMO_SCRIPT.md) once end to end.
 
@@ -159,39 +167,46 @@ Every live assessment is written to BigQuery straight away; a BigQuery failure i
 
 It deploys `claimsat-api` (with `DEMO_MODE=true` and the officer code), reads its URL, then deploys `claimsat-web` pointing at it, and prints the app URL. Check the current Gemini Flash model name in Vertex AI; `/status` shows an error if it's wrong.
 
-## How the damage score works
+## How it measures and verifies a claim
 
-All measurements are means over the registered plot at 10 m resolution. Event date = E.
+**One satellite: Sentinel-2.** For the registered plot, ClaimSat picks two cloud-free images: the one closest to **1 week before** the event (searching 3–12 days before), and the **latest** one (up to 14 days after, or today). From each image it reads two things:
 
-| Measurement | How |
-|---|---|
-| Crop health (NDVI) | Cloud-masked Sentinel-2 (Cloud Score+ ≥ 0.6). Before: E−30 to E−1 days; after: E+5 to E+30. Baseline: the same "after" weeks in each of the previous 3 years. |
-| `ndvi_loss` | (baseline − after) / max(baseline, 0.1), clamped to 0–1: the share of *normal* crop health that is missing, so a normal harvest isn't counted as damage. |
-| `flood_fraction` | Share of the plot where post-event Sentinel-1 VV < −16 dB **and** it dropped by more than 3 dB, excluding permanent water (JRC occurrence > 50%). |
-| `rain_deficit` | 1 − season rain / 20-year mean for the same window (CHIRPS), clamped to 0–1. Droughts only. |
+| Reading | Bands | Meaning |
+|---|---|---|
+| Crop health (NDVI) | near-infrared vs red (B8, B4) | Healthy plants reflect near-infrared strongly |
+| Standing water (MNDWI) | green vs short-wave infrared (B3, B11) | Water absorbs short-wave infrared; MNDWI > 0 = water |
 
-**Damage score (0–100):** flood = 100 × (0.5 × flood_fraction + 0.5 × ndvi_loss); drought = 100 × (0.6 × ndvi_loss + 0.4 × rain_deficit); other = 100 × ndvi_loss. If a part is missing, the others are re-weighted and confidence drops. **Levels:** none < 15 ≤ low < 35 ≤ moderate < 60 ≤ severe.
+- `ndvi_loss` = (NDVI 1 week before − NDVI now) / max(NDVI before, 0.1), clamped to 0–1.
+- `flood_fraction` = share of the plot that is water now but was dry a week before (pixels clear in both images).
+- **Damage score (0–100):** flood = 100 × (0.5 × flood_fraction + 0.5 × ndvi_loss); drought and other = 100 × ndvi_loss. **Levels:** none < 15 ≤ low < 35 ≤ moderate < 60 ≤ severe.
+- **Confidence:** *high* when both images are ≥ 80% clear, ≤ 21 days apart, the plot is ≥ 20 pixels and was green before (NDVI ≥ 0.4); *low* when an image is missing, the plot is < 10 pixels or there was little crop before (NDVI < 0.2); otherwise *medium*. The reasons are always shown.
 
-**Confidence:** *high* needs ≥ 3 cloud-free images before and after, ≥ 20 pixels, ≥ 60% cropland and (for floods) radar on both sides; *low* if there are no usable images (and no radar), < 30% cropland or < 10 pixels; otherwise *medium*. The reasons are always shown.
+**Two-step verification.**
+1. *Satellite:* passes if the images show at least low damage with usable confidence.
+2. *Weather, checked by AI:* ERA5-Land daily weather for the plot and a 50 km region around it (rain in the week before vs the 10-year normal for those dates, the wettest day, 30-day rain vs normal, the hottest day). A transparent rule gives a first verdict (e.g. flood: ≥ 64.5 mm in a day, IMD's "heavy rain", or a week ≥ 2× normal → supported; under 20 mm in the week → not supported), then Gemini reads the same facts and gives the final verdict with a plain explanation in English and Kannada. River floods from upstream rain are treated as "uncertain", never "fake". Gemini never accuses anyone.
 
-**Trust measures:** Gemini only writes words; every percentage it writes is checked against the measurements (one retry, then the report is flagged). Each report carries a SHA-256 "evidence fingerprint" of the measurements. Photo checks read the photo's GPS and date and flag photos > 200 m from the plot, without a location or date, before the event or > 60 days after; only a resized copy without location data is stored.
+Result: **verified** (both pass), **not supported** (both fail), otherwise **needs review**.
+
+**Case severity.** 70% this plot's damage score + 30% nearby reports: other farmers within **2 km** who reported the same kind of event within **±7 days** (5 or more farmers = full 30). A **single report can't be rated severe** until nearby reports confirm it, and a claim that isn't supported is capped at low.
+
+**Other trust measures:** farmers can't draw plots (officers register them, overlaps refused); every percentage in a Gemini report is checked against the measurements (if Gemini is unavailable, a template writes the report from the same numbers); each report carries a SHA-256 "evidence fingerprint"; photo checks read GPS and date and store only a copy without location data.
 
 ## Limitations
 
-- Supporting evidence only. The score is a documented heuristic, not a calibrated loss model, and it has not been validated against field assessments.
+- Supporting evidence only. The scores are documented heuristics, not a calibrated loss model, and have not been validated against field assessments.
+- Only two images are compared: slow changes such as drought show less, and a harvest in that week can look like damage (the weather check and nearby reports help here).
+- Sentinel-2 is optical: thick monsoon cloud can hide the field. Then confidence drops, or the "now" image is missing until a clear day.
+- Weather data (ERA5-Land) arrives a few days late, so very recent claims may show the weather step as pending.
 - 10 m pixels: very small or narrow plots are less reliable; edges mix with neighbouring land.
-- Optical images need clear skies; monsoon floods rely mostly on radar.
 - The crop type is as stated by the farmer or officer, not detected.
 - The officer access code is a single shared code (fine for a demo, not production). The plot registry stands in for a link to the state land records.
-- The two sample plots (`api/app/seed_plots.json`) are placeholders near Athani town, not real farmland; the real demo fields come from `find_demo_plots`.
+- The three sample plots (`api/app/seed_plots.json`) and the six neighbouring reports (`api/app/seed_reports.json`) are illustrative; real demo fields come from `find_demo_plots`.
 
 ## Data sources and attribution
 
-- Copernicus Sentinel-1 and Sentinel-2 data (European Space Agency / European Commission), free and open.
-- CHIRPS daily rainfall, Climate Hazards Center, UC Santa Barbara.
-- Dynamic World land cover, Google and World Resources Institute.
-- JRC Global Surface Water, European Commission Joint Research Centre.
-- Cloud Score+ cloud mask, Google.
+- Copernicus Sentinel-2 data (European Space Agency / European Commission), free and open.
+- Cloud Score+ cloud mask for Sentinel-2, Google.
+- ERA5-Land daily weather, ECMWF / Copernicus Climate Change Service.
 - Map tiles: Esri World Imagery and Esri World Boundaries and Places.
 
 Accessed through Google Earth Engine; see each dataset's page in the Earth Engine catalog for its exact terms.

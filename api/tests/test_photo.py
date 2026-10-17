@@ -10,7 +10,7 @@ from app import assessments, config, ee_analysis, main, photo_check, storage, wa
 from tests.test_api import BODY, FAKE_ANALYSIS
 from tests.test_validation import square
 
-PLOT = square(lng=75.06, lat=16.73)  # ~110 m square centred on 16.73 N, 75.06 E
+PLOT = square(lng=75.0584, lat=16.7323)  # ~110 m square: sample plot plt_seed_1
 
 
 def dms(value):
@@ -38,8 +38,8 @@ def jpeg(lat=None, lng=None, taken="2019:08:10 09:30:00", size=(64, 48), fmt="JP
 
 
 def test_read_exif_gps_and_time():
-    exif = photo_check.read_exif(Image.open(io.BytesIO(jpeg(16.73, 75.06))))
-    assert exif["gps"] == pytest.approx({"lat": 16.73, "lng": 75.06}, abs=1e-5)
+    exif = photo_check.read_exif(Image.open(io.BytesIO(jpeg(16.7323, 75.0584))))
+    assert exif["gps"] == pytest.approx({"lat": 16.7323, "lng": 75.0584}, abs=1e-5)
     assert exif["taken_at"] == "2019-08-10T09:30:00"
 
 
@@ -51,19 +51,19 @@ def test_read_exif_southern_western_and_missing():
 
 
 def test_distance_to_plot():
-    assert photo_check.distance_to_plot_m(16.73, 75.06, PLOT) == 0
-    # The top edge is at 16.7305; 0.0005 deg of latitude further north ≈ 56 m.
-    assert 50 < photo_check.distance_to_plot_m(16.7310, 75.06, PLOT) < 60
+    assert photo_check.distance_to_plot_m(16.7323, 75.0584, PLOT) == 0
+    # The top edge is at 16.7328; 0.0005 deg of latitude further north ≈ 56 m.
+    assert 50 < photo_check.distance_to_plot_m(16.7333, 75.0584, PLOT) < 60
 
 
 @pytest.mark.parametrize(
     "exif, flags",
     [
-        ({"gps": {"lat": 16.73, "lng": 75.06}, "taken_at": "2019-08-10T09:30:00"}, []),
+        ({"gps": {"lat": 16.7323, "lng": 75.0584}, "taken_at": "2019-08-10T09:30:00"}, []),
         ({"gps": None, "taken_at": "2019-08-10T09:30:00"}, ["no_gps"]),
-        ({"gps": {"lat": 16.75, "lng": 75.06}, "taken_at": None}, ["far_from_plot", "no_timestamp"]),
-        ({"gps": {"lat": 16.73, "lng": 75.06}, "taken_at": "2019-08-01T09:30:00"}, ["taken_before_event"]),
-        ({"gps": {"lat": 16.73, "lng": 75.06}, "taken_at": "2019-12-01T09:30:00"}, ["taken_long_after_event"]),
+        ({"gps": {"lat": 16.75, "lng": 75.0584}, "taken_at": None}, ["far_from_plot", "no_timestamp"]),
+        ({"gps": {"lat": 16.7323, "lng": 75.0584}, "taken_at": "2019-08-01T09:30:00"}, ["taken_before_event"]),
+        ({"gps": {"lat": 16.7323, "lng": 75.0584}, "taken_at": "2019-12-01T09:30:00"}, ["taken_long_after_event"]),
     ],
 )
 def test_location_and_time_flags(exif, flags):
@@ -72,12 +72,12 @@ def test_location_and_time_flags(exif, flags):
 
 
 def test_location_and_time_values():
-    result = photo_check.location_and_time({"gps": {"lat": 16.73, "lng": 75.06}, "taken_at": "2019-08-10T09:30:00"}, PLOT, "2019-08-07")
+    result = photo_check.location_and_time({"gps": {"lat": 16.7323, "lng": 75.0584}, "taken_at": "2019-08-10T09:30:00"}, PLOT, "2019-08-07")
     assert result == {"distance_m": 0, "inside_plot": True, "days_from_event": 3, "flags": []}
 
 
 def test_load_photo_strips_location_and_downscales():
-    exif, stored = photo_check.load_photo(jpeg(16.73, 75.06, size=(4000, 3000)))
+    exif, stored = photo_check.load_photo(jpeg(16.7323, 75.0584, size=(4000, 3000)))
     assert exif["gps"] is not None
     reopened = Image.open(io.BytesIO(stored))
     assert max(reopened.size) == photo_check.MAX_SIDE_PX
@@ -139,7 +139,7 @@ def upload(client, assessment_id, data, name="field.jpg"):
 
 def test_photo_check_endpoint(client):
     assessment_id = client.post("/api/assess", json=BODY).json()["assessment_id"]
-    response = upload(client, assessment_id, jpeg(16.73, 75.06))
+    response = upload(client, assessment_id, jpeg(16.7323, 75.0584))
     assert response.status_code == 200, response.text
     check = response.json()["photo_check"]
     assert check["consistent"] is True

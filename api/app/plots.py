@@ -62,7 +62,6 @@ def _demo_plots():
                 "default_event": {
                     "event_type": demo["event_type"],
                     "event_date": demo["event_date"],
-                    **({"season_window": demo["season_window"]} if demo.get("season_window") else {}),
                 },
                 "source": "demo",
                 "registered_by": "demo",

@@ -26,15 +26,15 @@ const STEPS = [
     text: "After a flood or drought, enters their Farmer ID, picks their plot and the date. No drawing, no paperwork.",
   },
   {
-    who: "Satellites + Gemini",
-    title: "Evidence in their language",
-    text: "Radar, crop health and rainfall are compared with normal years. A report in English and ಕನ್ನಡ is ready to attach to the claim.",
+    who: "Satellite + AI checks",
+    title: "Verified evidence",
+    text: "A Sentinel-2 image from 1 week before is compared with the latest one. AI checks the weather record, nearby reports set the severity, and a report in English and ಕನ್ನಡ is ready.",
   },
 ];
 
 const TRUST = [
   ["Plots come from land records", "Farmers can’t draw or enlarge their land; officers register it."],
-  ["Gemini writes words, not numbers", "Every percentage in a report is checked against the measurements."],
+  ["Two-step verification", "Satellite images must show damage, and AI checks the weather record supports the claim."],
   ["Evidence fingerprint", "A code on each report shows if any number was changed later."],
 ];
 
@@ -100,7 +100,7 @@ export default function Home() {
           <h2 className="text-xl font-semibold text-ink">For farmers</h2>
           <ul className="mt-3 flex-1 list-disc space-y-1 pl-5 text-ink-muted">
             <li>Use the Farmer ID from your registration slip</li>
-            <li>See your damage score and why</li>
+            <li>See the case severity and two-step verification</li>
             <li>Get a report in English or ಕನ್ನಡ, ready to print</li>
             <li>Add a photo of the field as extra evidence</li>
           </ul>

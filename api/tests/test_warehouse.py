@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app import assessments, config, ee_analysis, main, storage, warehouse
@@ -23,7 +24,7 @@ def test_rows_match_the_table_schemas():
     plot_row, assessment_row = warehouse.rows_for(SAMPLE)
     assert set(plot_row) == {f.name for f in warehouse.PLOTS_SCHEMA}
     assert set(assessment_row) == {f.name for f in warehouse.ASSESSMENTS_SCHEMA}
-    assert plot_row["geom"].startswith("POLYGON((75.0595 16.7295")
+    assert plot_row["geom"].startswith("POLYGON((75.0579 16.7318")
     assert assessment_row["damage_level"] == "severe"
     assert assessment_row["confidence"] == "high"
     assert assessment_row["plot_id"] == plot_row["plot_id"]
@@ -118,15 +119,17 @@ def test_village_grid_and_batch_results():
     assert len(plots) == n * n
 
     measured = [
-        {"properties": {"i": 0, "ndvi_before": 0.7, "ndvi_after": 0.2, "ndvi_baseline_after": 0.7,
-                        "flood_fraction": 0.9, "crop_fraction": 0.9, "clear_obs_before": 3.2, "clear_obs_after": 2.6}},
-        {"properties": {"i": 1, "crop_fraction": 0.2}},  # not cropland: dropped
+        {"properties": {"i": 0, "ndvi_before": 0.7, "ndvi_now": 0.2, "water_before": 0.0, "water_now": 0.9,
+                        "flood_fraction": 0.9, "before_clear": 0.95, "now_clear": 0.9}},
+        {"properties": {"i": 1, "ndvi_before": 0.1}},  # not green before: dropped
     ]
-    results = batch_village.build_results(plots, measured, {"pre": 2, "post": 1}, "flood", "2019-08-07", {}, 120)
+    windows = {"before": {"start": "2019-07-26", "end": "2019-08-04"}, "now": {"start": "2019-08-07", "end": "2019-08-21"}}
+    results = batch_village.build_results(plots, measured, "flood", "2019-08-07", windows, 120)
     assert len(results) == 1
     r = results[0]
     assert r["source"] == "batch"
-    assert r["metrics"]["clear_obs_after"] == 3
+    assert r["metrics"]["ndvi_loss"] == pytest.approx(0.714, abs=0.001)
+    assert r["metrics"]["days_between"] == 17
     assert r["score"]["damage_level"] == "severe"
     assert 0.9 < r["plot"]["area_ha"] < 1.1
     assert r["evidence_hash"].startswith("sha256:")
